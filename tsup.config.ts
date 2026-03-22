@@ -12,5 +12,5 @@ export default defineConfig({
   clean: true,
   target: 'node20',
   splitting: false,
-  external: ['@ast-grep/napi'],
+  external: ['@ast-grep/napi', '@ast-grep/lang-python'],
 });
