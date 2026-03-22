@@ -1,0 +1,12 @@
+.mcp.json
+CLAUDE.md
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+*.tgz
+.DS_Store
+.idea/
+.vscode/
+*.log
