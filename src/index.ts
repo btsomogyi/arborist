@@ -74,3 +74,8 @@ export {
   detectOverlaps,
 } from './engine/edit-validator.js';
 export type { ResolvedEdit, Overlap } from './engine/edit-validator.js';
+
+// Languages
+export { registerBuiltinProviders } from './languages/index.js';
+export { typescriptProvider, tsxProvider } from './languages/typescript.js';
+export { pythonProvider } from './languages/python.js';
