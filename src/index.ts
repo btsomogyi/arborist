@@ -75,6 +75,12 @@ export {
 } from './engine/edit-validator.js';
 export type { ResolvedEdit, Overlap } from './engine/edit-validator.js';
 
+// Operations
+export { structuralReplace, structuralReplaceSource } from './operations/replace.js';
+export { renameSymbol, renameSymbolSource } from './operations/rename.js';
+export { insertContent, insertContentSource } from './operations/insert.js';
+export { removeNode, removeNodeSource } from './operations/remove.js';
+
 // Languages
 export { registerBuiltinProviders } from './languages/index.js';
 export { typescriptProvider, tsxProvider } from './languages/typescript.js';
