@@ -4,6 +4,7 @@ import { FileError, ProviderError, QueryError } from '../core/errors.js';
 import type { QueryMatch, QueryOptions, QueryResult, Range, ByteRange } from '../core/types.js';
 import { parseLangSource } from './parser.js';
 import type { SgNode } from './parser.js';
+import { resolvePattern } from './go-pattern-fix.js';
 
 export async function queryFile(
   filePath: string,
@@ -65,7 +66,8 @@ export function querySource(
 
   let nodes: SgNode[];
   try {
-    nodes = sgRoot.root().findAll(pattern);
+    const matcher = resolvePattern(pattern, language);
+    nodes = sgRoot.root().findAll(matcher);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     throw new QueryError(

@@ -54,11 +54,37 @@ export const testPythonProvider: LanguageProvider = {
   },
 };
 
+export const testGoProvider: LanguageProvider = {
+  id: 'go',
+  displayName: 'Go',
+  extensions: ['.go'],
+  astGrepLang: 'go',
+  patterns: {
+    functionDeclaration: 'func $NAME($$$PARAMS) $$$RET { $$$BODY }',
+    classDeclaration: 'type $NAME struct { $$$FIELDS }',
+    variableDeclaration: 'var $NAME $TYPE = $VALUE',
+    importStatement: 'import $$$IMPORTS',
+    exportStatement: 'func $NAME($$$PARAMS) $$$RET { $$$BODY }',
+    fmtPrintln: 'fmt.Println($$$ARGS)',
+  },
+  nodeTypes: {
+    function: ['function_declaration', 'method_declaration'],
+    class: ['type_declaration'],
+    variable: ['var_declaration', 'short_var_declaration'],
+    import: ['import_declaration'],
+    parameter: ['parameter_declaration'],
+    identifier: ['identifier', 'field_identifier', 'package_identifier', 'type_identifier'],
+  },
+};
+
 export function registerTestProviders(): void {
   if (!registry.has('typescript')) {
     registry.register(testTypescriptProvider);
   }
   if (!registry.has('python')) {
     registry.register(testPythonProvider);
+  }
+  if (!registry.has('go')) {
+    registry.register(testGoProvider);
   }
 }

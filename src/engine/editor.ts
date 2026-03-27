@@ -13,6 +13,7 @@ import { parseLangSource } from './parser.js';
 import type { SgNode, SgRoot } from './parser.js';
 import { validateEdits, sortEdits } from './edit-validator.js';
 import type { ResolvedEdit } from './edit-validator.js';
+import { resolvePattern } from './go-pattern-fix.js';
 
 export async function applyEdit(
   filePath: string,
@@ -64,7 +65,7 @@ export function applyEditToSource(
   }
 
   const sgRoot = parseLangSource(source, provider.astGrepLang);
-  const resolved = resolveOperation(sgRoot, source, operation);
+  const resolved = resolveOperation(sgRoot, source, operation, language);
 
   if (resolved.length === 0) {
     return {
@@ -119,18 +120,20 @@ export function resolveOperation(
   sgRoot: SgRoot,
   source: string,
   operation: EditOperation,
+  language?: string,
 ): ResolvedEdit[] {
   const root = sgRoot.root();
+  const lang = language ?? '';
 
   switch (operation.kind) {
     case 'replace':
-      return resolveReplace(root, source, operation.pattern, operation.replacement, operation.matchIndex, operation.scope);
+      return resolveReplace(root, source, operation.pattern, operation.replacement, lang, operation.matchIndex, operation.scope);
     case 'rename':
-      return resolveRename(root, operation.from, operation.to, operation.scope);
+      return resolveRename(root, operation.from, operation.to, lang, operation.scope);
     case 'insert':
-      return resolveInsert(root, source, operation.anchor, operation.position, operation.content);
+      return resolveInsert(root, source, operation.anchor, operation.position, operation.content, lang);
     case 'remove':
-      return resolveRemove(root, source, operation.pattern, operation.matchIndex);
+      return resolveRemove(root, source, operation.pattern, lang, operation.matchIndex);
     case 'raw':
       return resolveRaw(source, operation.edits);
     default: {
@@ -145,13 +148,15 @@ function resolveReplace(
   source: string,
   pattern: string,
   replacement: string,
+  language: string,
   matchIndex?: number,
   scope?: string,
 ): ResolvedEdit[] {
   let searchRoot = root;
 
   if (scope) {
-    const scopeNode = root.find(scope);
+    const scopeMatcher = resolvePattern(scope, language);
+    const scopeNode = root.find(scopeMatcher);
     if (!scopeNode) {
       throw new EditError(`Scope pattern not found: ${scope}`, { scope, pattern });
     }
@@ -160,7 +165,8 @@ function resolveReplace(
 
   let matches: SgNode[];
   try {
-    matches = searchRoot.findAll(pattern);
+    const matcher = resolvePattern(pattern, language);
+    matches = searchRoot.findAll(matcher);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     throw new EditError(`Invalid pattern: ${msg}`, { pattern, cause: msg });
@@ -187,12 +193,14 @@ function resolveRename(
   root: SgNode,
   from: string,
   to: string,
+  language: string,
   scope?: string,
 ): ResolvedEdit[] {
   let searchRoot = root;
 
   if (scope) {
-    const scopeNode = root.find(scope);
+    const scopeMatcher = resolvePattern(scope, language);
+    const scopeNode = root.find(scopeMatcher);
     if (!scopeNode) {
       throw new EditError(`Scope pattern not found: ${scope}`, { scope, from, to });
     }
@@ -231,8 +239,10 @@ function resolveInsert(
   anchor: string,
   position: 'before' | 'after' | 'prepend' | 'append',
   content: string,
+  language: string,
 ): ResolvedEdit[] {
-  const anchorNode = root.find(anchor);
+  const anchorMatcher = resolvePattern(anchor, language);
+  const anchorNode = root.find(anchorMatcher);
   if (!anchorNode) {
     throw new EditError(`Anchor pattern not found: ${anchor}`, { anchor, position });
   }
@@ -289,11 +299,13 @@ function resolveRemove(
   root: SgNode,
   source: string,
   pattern: string,
+  language: string,
   matchIndex?: number,
 ): ResolvedEdit[] {
   let matches: SgNode[];
   try {
-    matches = root.findAll(pattern);
+    const matcher = resolvePattern(pattern, language);
+    matches = root.findAll(matcher);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     throw new EditError(`Invalid pattern: ${msg}`, { pattern, cause: msg });
