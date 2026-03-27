@@ -2,16 +2,19 @@ import { readFile, stat } from 'node:fs/promises';
 import { parse as astGrepParse, registerDynamicLanguage } from '@ast-grep/napi';
 import { ts, tsx, js, jsx } from '@ast-grep/napi';
 import python from '@ast-grep/lang-python';
+import go from '@ast-grep/lang-go';
+import rust from '@ast-grep/lang-rust';
 import { registry } from '../core/language-registry.js';
 import { FileError, ProviderError } from '../core/errors.js';
 import type { ASTNode, ParseOptions, ParseResult, Range, ByteRange } from '../core/types.js';
 
-// Register Python language support on module load
-let pythonRegistered = false;
-function ensurePythonRegistered(): void {
-  if (!pythonRegistered) {
-    registerDynamicLanguage({ python });
-    pythonRegistered = true;
+// Register dynamic language support on module load
+// All dynamic languages must be registered in a single call to avoid conflicts
+let dynamicLangsRegistered = false;
+function ensureDynamicLangsRegistered(): void {
+  if (!dynamicLangsRegistered) {
+    registerDynamicLanguage({ python, go, rust });
+    dynamicLangsRegistered = true;
   }
 }
 
@@ -50,7 +53,7 @@ export function parseLangSource(source: string, astGrepLang: string): SgRoot {
     return builtin(source);
   }
   // Dynamic languages (Python, etc.) use the generic parse()
-  ensurePythonRegistered();
+  ensureDynamicLangsRegistered();
   return astGrepParse(astGrepLang.toLowerCase(), source);
 }
 

@@ -32,7 +32,9 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
+    "@ast-grep/lang-go": "^0.0.6",
     "@ast-grep/lang-python": "^0.0.6",
+    "@ast-grep/lang-rust": "^0.0.7",
     "@ast-grep/napi": "^0.42.0",
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@rollup/rollup-linux-arm64-gnu": "^4.60.0",

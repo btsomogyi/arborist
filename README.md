@@ -157,6 +157,10 @@ const cleaned = applyEditToSource(source, 'typescript', {
 | `arborist_list_symbols` | Extract function/class/variable definitions |
 | `arborist_rename` | Rename a symbol across a file |
 
+## Benchmarks
+
+The benchmark suite exercises all six MCP tools across TypeScript, Python, Go, and Rust, measuring token savings compared to the traditional Read+Edit approach. The primary metric is the reduction in context-window tokens achieved by using Arborist's pattern-based edits (a single tool call with a structural pattern) versus reading the entire file and issuing multiple edit calls. See [`tests/benchmarks/benchmark.test.ts`](tests/benchmarks/benchmark.test.ts) for the full suite, and [BENCHMARK.md](docs/BENCHMARK.md) for results..
+
 ## Development
 
 ```bash
