@@ -103,7 +103,7 @@ describe('MCP tool handlers (functional)', () => {
       const provider = registry.inferFromFilePath(FIXTURE);
       expect(provider).toBeDefined();
       // Use consoleLog pattern which is known to match the fixture
-      const pattern = provider!.patterns.consoleLog;
+      const pattern = provider?.patterns.consoleLog ?? 'console.log($$$ARGS)';
       const result = await queryFile(FIXTURE, pattern);
       expect(result.matchCount).toBeGreaterThan(0);
     });

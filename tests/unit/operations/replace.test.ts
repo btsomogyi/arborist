@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { structuralReplaceSource } from '../../../src/operations/replace.js';
 import { registerBuiltinProviders } from '../../../src/languages/index.js';
-import type { StructuralReplace } from '../../../src/core/types.js';
+
 
 beforeAll(() => {
   registerBuiltinProviders();
