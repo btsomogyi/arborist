@@ -157,6 +157,35 @@ const cleaned = applyEditToSource(source, 'typescript', {
 | `scissorhands_list_symbols` | Extract function/class/variable definitions |
 | `scissorhands_rename` | Rename a symbol across a file |
 
+## Claude Code Skill
+
+Scissorhands ships as a [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that teaches Claude how to use the MCP tools for structural edits.
+
+### Install the skill
+
+Tell Claude Code:
+
+```
+Install the scissorhands skill from https://github.com/btsomogyi/scissorhands
+```
+
+Claude will copy `skills/scissorhands/` into your local `~/.claude/skills/` directory.
+
+### Register the MCP server
+
+The skill requires the scissorhands MCP server. You can run it directly via npx or install globally first:
+
+```bash
+# Option A: run via npx (no install needed)
+claude mcp add scissorhands -- npx -y scissorhands-mcp
+
+# Option B: install globally, then register
+npm install -g scissorhands
+claude mcp add scissorhands -- scissorhands-mcp
+```
+
+Once both are in place, Claude Code can use the 6 scissorhands tools (parse, query, edit, batch, list_symbols, rename) for structure-aware code edits across TypeScript, Python, Go, and Rust.
+
 ## Benchmarks
 
 The benchmark suite exercises all six MCP tools across TypeScript, Python, Go, and Rust, measuring token savings compared to the traditional Read+Edit approach. The primary metric is the reduction in context-window tokens achieved by using Scissorhands's pattern-based edits (a single tool call with a structural pattern) versus reading the entire file and issuing multiple edit calls. See [`tests/benchmarks/benchmark.test.ts`](tests/benchmarks/benchmark.test.ts) for the full suite, and [BENCHMARK.md](docs/BENCHMARK.md) for results..

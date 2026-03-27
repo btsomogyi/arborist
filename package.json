@@ -6,7 +6,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "scissorhands": "./dist/cli/index.js"
+    "scissorhands": "./dist/cli/index.js",
+    "scissorhands-mcp": "./dist/mcp/server.js"
   },
   "exports": {
     ".": {
@@ -60,5 +61,13 @@
     "mcp",
     "ai-agents"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/btsomogyi/scissorhands.git"
+  },
+  "homepage": "https://github.com/btsomogyi/scissorhands#readme",
+  "bugs": {
+    "url": "https://github.com/btsomogyi/scissorhands/issues"
+  },
   "license": "MIT"
 }

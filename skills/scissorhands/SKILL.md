@@ -7,6 +7,27 @@ description: Performs AST-based structural code edits across TypeScript, Python,
 Applies surgical, structure-aware edits to source code files via 6 MCP tools powered by ast-grep and tree-sitter. Edits target AST nodes using patterns written in the language itself (e.g., `console.log($MSG)`), preserving all surrounding formatting, comments, and whitespace. Supports TypeScript/JavaScript/JSX/TSX, Python, Go, and Rust.
 </objective>
 
+<install>
+**Install the skill** (tell Claude Code to install from the repo):
+
+```
+Install the scissorhands skill from https://github.com/btsomogyi/scissorhands
+```
+
+Claude will copy `skills/scissorhands/` into `~/.claude/skills/scissorhands/`.
+
+**Register the MCP server** (required for the 6 tools):
+
+```bash
+# Option A: run via npx (no install needed)
+claude mcp add scissorhands -- npx -y scissorhands-mcp
+
+# Option B: install globally, then register
+npm install -g scissorhands
+claude mcp add scissorhands -- scissorhands-mcp
+```
+</install>
+
 <quick_start>
 **Setup** (MCP server must be registered first):
 
