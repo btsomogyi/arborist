@@ -1,12 +1,12 @@
 /**
- * Arborist Benchmark Suite
+ * Scissorhands Benchmark Suite
  *
  * Exercises all 6 MCP tools across TypeScript, Python, Go, and Rust.
  * Measures token savings vs traditional Read+Edit approach.
  *
  * Token savings methodology:
  *   Traditional = Read(entire file) + N x Edit(old_string, new_string)
- *   Arborist    = 1 tool call with pattern (no file read needed)
+ *   Scissorhands    = 1 tool call with pattern (no file read needed)
  *
  * The primary savings come from eliminating the need to read the full file
  * into the agent's context window for structural operations.
@@ -20,7 +20,7 @@ import { applyEditToSource } from '../../src/engine/editor.js';
 import '../../src/languages/index.js';
 import {
   measureTraditionalApproach,
-  measureArboristApproach,
+  measureScissorhandsApproach,
   computeSavings,
   formatReport,
   type BenchmarkResult,
@@ -162,8 +162,8 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
     source = await loadFixture(lang);
   });
 
-  // ── arborist_parse ────────────────────────────────────────────────────
-  describe('arborist_parse', () => {
+  // ── scissorhands_parse ────────────────────────────────────────────────────
+  describe('scissorhands_parse', () => {
     it('parses the file and returns AST summary', async () => {
       const result = await parseFile(filePath, { maxDepth: 3 });
 
@@ -171,7 +171,7 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
       expect(result.language).toBe(lang.id);
       expect(result.lineCount).toBeGreaterThan(50);
 
-      // For parse, the arborist advantage is returning a structured summary
+      // For parse, the scissorhands advantage is returning a structured summary
       // rather than raw file content. The agent uses this to understand
       // the file structure WITHOUT reading the entire file.
       const instruction = `Parse ${lang.file} and show me the top-level structure`;
@@ -184,15 +184,15 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         newStrings: [],
       });
 
-      // Arborist: returns a depth-limited AST summary (~10-15% of file size)
+      // Scissorhands: returns a depth-limited AST summary (~10-15% of file size)
       // We count only the top-level node names, not the full recursive AST
       const topLevelSummary = result.root.namedChildren
         .map((n) => `${n.type}:${n.text.slice(0, 40)}`)
         .join('\n');
 
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
-        toolCall: { tool: 'arborist_parse', input: { file: filePath, depth: 3 } },
+        toolCall: { tool: 'scissorhands_parse', input: { file: filePath, depth: 3 } },
         resultSize: topLevelSummary.length,
       });
 
@@ -200,11 +200,11 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'parse-file',
           lang.id,
-          'arborist_parse',
+          'scissorhands_parse',
           'Parse file and inspect AST structure',
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
@@ -216,8 +216,8 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
     });
   });
 
-  // ── arborist_query ────────────────────────────────────────────────────
-  describe('arborist_query', () => {
+  // ── scissorhands_query ────────────────────────────────────────────────────
+  describe('scissorhands_query', () => {
     it('finds function declarations', async () => {
       const result = await queryFile(filePath, lang.patterns.functionDecl);
 
@@ -237,10 +237,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         const matchSummary = result.matches
           .map((m) => `${m.captures['NAME'] ?? m.text.slice(0, 50)} L${m.range.start.line}`)
           .join('\n');
-        const arborist = measureArboristApproach({
+        const scissorhands = measureScissorhandsApproach({
           instruction,
           toolCall: {
-            tool: 'arborist_query',
+            tool: 'scissorhands_query',
             input: { file: filePath, pattern: lang.patterns.functionDecl },
           },
           resultSize: matchSummary.length,
@@ -250,11 +250,11 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
           computeSavings(
             'query-functions',
             lang.id,
-            'arborist_query',
+            'scissorhands_query',
             'Find function declarations',
             source,
             traditional,
-            arborist,
+            scissorhands,
           ),
         );
       }
@@ -276,10 +276,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
       const matchSummary = result.matches
         .map((m) => `${m.text.slice(0, 60)} L${m.range.start.line}`)
         .join('\n');
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_query',
+          tool: 'scissorhands_query',
           input: { file: filePath, pattern: lang.patterns.printCall },
         },
         resultSize: matchSummary.length,
@@ -289,11 +289,11 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'query-print-calls',
           lang.id,
-          'arborist_query',
+          'scissorhands_query',
           'Find all print/log statements',
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
@@ -314,10 +314,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
       const matchSummary = result.matches
         .map((m) => `${m.text.slice(0, 60)} L${m.range.start.line}`)
         .join('\n');
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_query',
+          tool: 'scissorhands_query',
           input: { file: filePath, pattern: lang.patterns.classOrStruct },
         },
         resultSize: matchSummary.length,
@@ -327,11 +327,11 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'query-classes',
           lang.id,
-          'arborist_query',
+          'scissorhands_query',
           'Find all class/struct declarations',
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
@@ -352,10 +352,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
       const matchSummary = result.matches
         .map((m) => `${m.text.slice(0, 80)} L${m.range.start.line}`)
         .join('\n');
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_query',
+          tool: 'scissorhands_query',
           input: { file: filePath, pattern: lang.patterns.importStatement },
         },
         resultSize: matchSummary.length,
@@ -365,18 +365,18 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'query-imports',
           lang.id,
-          'arborist_query',
+          'scissorhands_query',
           'Find all import statements',
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
   });
 
-  // ── arborist_edit (replace) ───────────────────────────────────────────
-  describe('arborist_edit — replace', () => {
+  // ── scissorhands_edit (replace) ───────────────────────────────────────────
+  describe('scissorhands_edit — replace', () => {
     it('replaces print calls with logger calls', () => {
       const result = applyEditToSource(source, lang.id, {
         kind: 'replace',
@@ -398,10 +398,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         oldStrings,
         newStrings,
       });
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_edit',
+          tool: 'scissorhands_edit',
           input: {
             file: `fixture${lang.ext}`,
             operation: {
@@ -418,18 +418,18 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'replace-print-calls',
           lang.id,
-          'arborist_edit',
+          'scissorhands_edit',
           `Replace print/log calls (${result.editCount} occurrences)`,
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
   });
 
-  // ── arborist_edit (insert) ────────────────────────────────────────────
-  describe('arborist_edit — insert', () => {
+  // ── scissorhands_edit (insert) ────────────────────────────────────────────
+  describe('scissorhands_edit — insert', () => {
     it('inserts a doc comment before a function', () => {
       // Try the insert; if anchor doesn't match, still measure the token cost
       let editCount = 0;
@@ -453,10 +453,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         oldStrings: ['function validateEmail'],
         newStrings: [lang.patterns.insertContent + '\nfunction validateEmail'],
       });
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_edit',
+          tool: 'scissorhands_edit',
           input: {
             file: `fixture${lang.ext}`,
             operation: {
@@ -474,18 +474,18 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'insert-doc-comment',
           lang.id,
-          'arborist_edit',
+          'scissorhands_edit',
           `Insert documentation (matched: ${editCount > 0})`,
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
   });
 
-  // ── arborist_edit (remove) ────────────────────────────────────────────
-  describe('arborist_edit — remove', () => {
+  // ── scissorhands_edit (remove) ────────────────────────────────────────────
+  describe('scissorhands_edit — remove', () => {
     it('removes print/log statements', () => {
       const result = applyEditToSource(source, lang.id, {
         kind: 'remove',
@@ -503,10 +503,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         oldStrings,
         newStrings,
       });
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_edit',
+          tool: 'scissorhands_edit',
           input: {
             file: `fixture${lang.ext}`,
             operation: { kind: 'remove', pattern: lang.patterns.removePattern },
@@ -519,18 +519,18 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'remove-print-calls',
           lang.id,
-          'arborist_edit',
+          'scissorhands_edit',
           `Remove print/log statements (${result.editCount} occurrences)`,
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
   });
 
-  // ── arborist_rename ───────────────────────────────────────────────────
-  describe('arborist_rename', () => {
+  // ── scissorhands_rename ───────────────────────────────────────────────────
+  describe('scissorhands_rename', () => {
     it('renames a symbol across the file', () => {
       const { from, to } = lang.patterns.renameTarget;
       const result = applyEditToSource(source, lang.id, {
@@ -549,10 +549,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         oldStrings: traditionalEdits.oldStrings,
         newStrings: traditionalEdits.newStrings,
       });
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_rename',
+          tool: 'scissorhands_rename',
           input: { file: `fixture${lang.ext}`, from, to },
         },
         resultSize: 200,
@@ -562,18 +562,18 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'rename-symbol',
           lang.id,
-          'arborist_rename',
+          'scissorhands_rename',
           `Rename ${from} -> ${to} (${result.editCount} sites)`,
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
   });
 
-  // ── arborist_list_symbols ─────────────────────────────────────────────
-  describe('arborist_list_symbols', () => {
+  // ── scissorhands_list_symbols ─────────────────────────────────────────────
+  describe('scissorhands_list_symbols', () => {
     it('lists symbols in the file', async () => {
       // Use query with print pattern as a proxy for list_symbols
       // (the MCP tool queries multiple patterns internally)
@@ -597,10 +597,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         ...classResult.matches.map((m) => `cls: ${m.text.slice(0, 40)} L${m.range.start.line}`),
       ].join('\n');
 
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_list_symbols',
+          tool: 'scissorhands_list_symbols',
           input: { file: filePath, symbolTypes: ['function', 'class'] },
         },
         resultSize: symbolSummary.length,
@@ -610,18 +610,18 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'list-symbols',
           lang.id,
-          'arborist_list_symbols',
+          'scissorhands_list_symbols',
           'List all functions and classes',
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
   });
 
-  // ── arborist_batch ────────────────────────────────────────────────────
-  describe('arborist_batch', () => {
+  // ── scissorhands_batch ────────────────────────────────────────────────────
+  describe('scissorhands_batch', () => {
     it('applies multiple edits atomically', () => {
       const { from, to } = lang.patterns.renameTarget;
 
@@ -651,10 +651,10 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         oldStrings: [...renameEdits.oldStrings, ...removeOldStrings],
         newStrings: [...renameEdits.newStrings, ...removeNewStrings],
       });
-      const arborist = measureArboristApproach({
+      const scissorhands = measureScissorhandsApproach({
         instruction,
         toolCall: {
-          tool: 'arborist_batch',
+          tool: 'scissorhands_batch',
           input: {
             edits: [
               { file: `fixture${lang.ext}`, operation: { kind: 'rename', from, to } },
@@ -672,11 +672,11 @@ describe.each(LANGUAGES)('Benchmark: $id', (lang) => {
         computeSavings(
           'batch-rename-remove',
           lang.id,
-          'arborist_batch',
+          'scissorhands_batch',
           `Atomic rename + remove (${totalEdits} total edits)`,
           source,
           traditional,
-          arborist,
+          scissorhands,
         ),
       );
     });
@@ -708,9 +708,9 @@ describe('Report', () => {
     // Verify edit-focused tools save tokens (parse may vary)
     const editResults = allResults.filter(
       (r) =>
-        r.tool === 'arborist_edit' ||
-        r.tool === 'arborist_rename' ||
-        r.tool === 'arborist_batch',
+        r.tool === 'scissorhands_edit' ||
+        r.tool === 'scissorhands_rename' ||
+        r.tool === 'scissorhands_batch',
     );
     for (const r of editResults) {
       expect(r.savings.percentReduction).toBeGreaterThan(50);

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  ArboristError,
+  ScissorhandsError,
   ParseError,
   QueryError,
   EditError,
@@ -10,10 +10,10 @@ import {
   FileError,
 } from '../../../src/core/errors.js';
 
-describe('ArboristError', () => {
+describe('ScissorhandsError', () => {
   it('sets name, code, and message', () => {
-    const err = new ArboristError('something went wrong', 'TEST_ERROR');
-    expect(err.name).toBe('ArboristError');
+    const err = new ScissorhandsError('something went wrong', 'TEST_ERROR');
+    expect(err.name).toBe('ScissorhandsError');
     expect(err.code).toBe('TEST_ERROR');
     expect(err.message).toBe('something went wrong');
     expect(err.details).toBeUndefined();
@@ -21,14 +21,14 @@ describe('ArboristError', () => {
 
   it('carries details bag', () => {
     const details = { file: 'test.ts', line: 42 };
-    const err = new ArboristError('fail', 'TEST', details);
+    const err = new ScissorhandsError('fail', 'TEST', details);
     expect(err.details).toEqual(details);
   });
 
   it('is an instance of Error', () => {
-    const err = new ArboristError('fail', 'X');
+    const err = new ScissorhandsError('fail', 'X');
     expect(err).toBeInstanceOf(Error);
-    expect(err).toBeInstanceOf(ArboristError);
+    expect(err).toBeInstanceOf(ScissorhandsError);
   });
 });
 
@@ -40,9 +40,9 @@ describe('ParseError', () => {
     expect(err.message).toBe('parse failed');
   });
 
-  it('is instanceof ArboristError and Error', () => {
+  it('is instanceof ScissorhandsError and Error', () => {
     const err = new ParseError('fail');
-    expect(err).toBeInstanceOf(ArboristError);
+    expect(err).toBeInstanceOf(ScissorhandsError);
     expect(err).toBeInstanceOf(Error);
   });
 
@@ -59,8 +59,8 @@ describe('QueryError', () => {
     expect(err.code).toBe('QUERY_ERROR');
   });
 
-  it('is instanceof ArboristError', () => {
-    expect(new QueryError('fail')).toBeInstanceOf(ArboristError);
+  it('is instanceof ScissorhandsError', () => {
+    expect(new QueryError('fail')).toBeInstanceOf(ScissorhandsError);
   });
 });
 
@@ -71,8 +71,8 @@ describe('EditError', () => {
     expect(err.code).toBe('EDIT_ERROR');
   });
 
-  it('is instanceof ArboristError', () => {
-    expect(new EditError('fail')).toBeInstanceOf(ArboristError);
+  it('is instanceof ScissorhandsError', () => {
+    expect(new EditError('fail')).toBeInstanceOf(ScissorhandsError);
   });
 });
 
@@ -82,10 +82,10 @@ describe('EditConflictError', () => {
     expect(err.name).toBe('EditConflictError');
   });
 
-  it('is instanceof EditError and ArboristError', () => {
+  it('is instanceof EditError and ScissorhandsError', () => {
     const err = new EditConflictError('fail');
     expect(err).toBeInstanceOf(EditError);
-    expect(err).toBeInstanceOf(ArboristError);
+    expect(err).toBeInstanceOf(ScissorhandsError);
     expect(err).toBeInstanceOf(Error);
   });
 
@@ -102,8 +102,8 @@ describe('ProviderError', () => {
     expect(err.code).toBe('PROVIDER_ERROR');
   });
 
-  it('is instanceof ArboristError', () => {
-    expect(new ProviderError('fail')).toBeInstanceOf(ArboristError);
+  it('is instanceof ScissorhandsError', () => {
+    expect(new ProviderError('fail')).toBeInstanceOf(ScissorhandsError);
   });
 });
 
@@ -114,8 +114,8 @@ describe('ValidationError', () => {
     expect(err.code).toBe('VALIDATION_ERROR');
   });
 
-  it('is instanceof ArboristError', () => {
-    expect(new ValidationError('fail')).toBeInstanceOf(ArboristError);
+  it('is instanceof ScissorhandsError', () => {
+    expect(new ValidationError('fail')).toBeInstanceOf(ScissorhandsError);
   });
 });
 
@@ -126,8 +126,8 @@ describe('FileError', () => {
     expect(err.code).toBe('FILE_ERROR');
   });
 
-  it('is instanceof ArboristError', () => {
-    expect(new FileError('fail')).toBeInstanceOf(ArboristError);
+  it('is instanceof ScissorhandsError', () => {
+    expect(new FileError('fail')).toBeInstanceOf(ScissorhandsError);
   });
 
   it('carries file details', () => {

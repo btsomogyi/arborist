@@ -6,7 +6,7 @@ import '../../languages/index.js';
 
 export function registerBatchTool(server: McpServer): void {
   server.tool(
-    'arborist_batch',
+    'scissorhands_batch',
     'Apply multiple edits atomically across files',
     batchInputSchema.shape,
     async (input) => {

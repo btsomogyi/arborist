@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Arborist is an AST-based polyglot code editor designed for AI agents. The core requirement is multi-language AST parsing and structural editing with high fidelity. Two mature ecosystems exist for AST manipulation in the Node.js/TypeScript world:
+Scissorhands is an AST-based polyglot code editor designed for AI agents. The core requirement is multi-language AST parsing and structural editing with high fidelity. Two mature ecosystems exist for AST manipulation in the Node.js/TypeScript world:
 
 1. **ast-grep** (`@ast-grep/napi`) — A Rust-based tool built on tree-sitter that adds pattern matching, code-native query syntax, and a `commitEdits()` API for transactional edits. Ships as a native NAPI addon with first-class Node.js bindings.
 

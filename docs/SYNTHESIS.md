@@ -1,4 +1,4 @@
-# Arborist: Design Synthesis & Options Analysis
+# Scissorhands: Design Synthesis & Options Analysis
 
 ## Agent Research Summary
 
@@ -40,7 +40,7 @@ Four specialized agents conducted parallel analysis:
 
 **Core dependency**: `@ast-grep/napi`
 
-**Architecture**: ast-grep handles parse + query + edit. Arborist adds the operation layer (rename, extract, wrap), CLI, MCP server, and language provider registry.
+**Architecture**: ast-grep handles parse + query + edit. Scissorhands adds the operation layer (rename, extract, wrap), CLI, MCP server, and language provider registry.
 
 **Edit model**: Pattern-as-selector — agents write patterns in the target language (`console.log($MSG)` not S-expressions). Three tiers: structural patterns (primary), named operations (convenience), raw positional edits (escape hatch).
 
@@ -67,7 +67,7 @@ Dependencies: @ast-grep/napi, @modelcontextprotocol/sdk, commander, zod
 
 **Core dependency**: `web-tree-sitter` + language-specific `.wasm` grammars
 
-**Architecture**: tree-sitter handles parsing. Arborist builds the full query engine (wrapping tree-sitter queries), edit engine (byte-range splicing with ordering/conflict detection), operation layer, CLI, and MCP server.
+**Architecture**: tree-sitter handles parsing. Scissorhands builds the full query engine (wrapping tree-sitter queries), edit engine (byte-range splicing with ordering/conflict detection), operation layer, CLI, and MCP server.
 
 **Edit model**: `NodeSelector` with multiple strategies (S-expression queries, node type + name, byte range, point range). Edits specified as `{ target: ByteRange, operation: replace|insert|delete, content }`.
 
@@ -164,7 +164,7 @@ interface EditResult {
 ### File Layout
 
 ```
-arborist/
+scissorhands/
   src/
     core/           # Types, errors, registry
     engine/         # Parser, query, edit engines
@@ -183,22 +183,22 @@ arborist/
 
 | Tool | Description |
 |------|-------------|
-| `arborist_parse` | Parse file, return AST structure |
-| `arborist_query` | Find nodes matching a pattern |
-| `arborist_edit` | Apply a single edit operation |
-| `arborist_batch` | Apply multiple edits atomically |
-| `arborist_list_symbols` | List functions, classes, imports |
-| `arborist_rename` | Rename symbol across file |
+| `scissorhands_parse` | Parse file, return AST structure |
+| `scissorhands_query` | Find nodes matching a pattern |
+| `scissorhands_edit` | Apply a single edit operation |
+| `scissorhands_batch` | Apply multiple edits atomically |
+| `scissorhands_list_symbols` | List functions, classes, imports |
+| `scissorhands_rename` | Rename symbol across file |
 
 ### CLI Commands
 
 ```
-arborist parse <file>
-arborist query <file> --pattern <pattern>
-arborist edit <file> --replace --pattern <p> --with <r>
-arborist edit <file> --rename --from <old> --to <new>
-arborist apply <edits.json>
-arborist providers list
+scissorhands parse <file>
+scissorhands query <file> --pattern <pattern>
+scissorhands edit <file> --replace --pattern <p> --with <r>
+scissorhands edit <file> --rename --from <old> --to <new>
+scissorhands apply <edits.json>
+scissorhands providers list
 ```
 
 ---

@@ -5,7 +5,7 @@ import '../../languages/index.js';
 
 export function registerParseTool(server: McpServer): void {
   server.tool(
-    'arborist_parse',
+    'scissorhands_parse',
     'Parse a source file and return its AST structure',
     parseInputSchema.shape,
     async (input) => {

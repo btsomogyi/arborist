@@ -1,6 +1,6 @@
-# Adding Language Support to Arborist
+# Adding Language Support to Scissorhands
 
-Arborist uses [`@ast-grep/napi`](https://ast-grep.github.io/reference/api.html) as its
+Scissorhands uses [`@ast-grep/napi`](https://ast-grep.github.io/reference/api.html) as its
 parsing and pattern-matching engine. Languages fall into two categories:
 
 1. **Built-in languages** — shipped with `@ast-grep/napi` (TypeScript, JavaScript, TSX, JSX, CSS, HTML)

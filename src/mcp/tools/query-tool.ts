@@ -5,7 +5,7 @@ import '../../languages/index.js';
 
 export function registerQueryTool(server: McpServer): void {
   server.tool(
-    'arborist_query',
+    'scissorhands_query',
     'Query a source file for AST pattern matches',
     queryInputSchema.shape,
     async (input) => {

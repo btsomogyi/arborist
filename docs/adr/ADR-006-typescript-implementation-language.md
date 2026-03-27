@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Arborist needs an implementation language that satisfies several constraints:
+Scissorhands needs an implementation language that satisfies several constraints:
 
 1. **Runtime compatibility.** Claude Code skills and MCP servers run in Node.js. The implementation language must target the Node.js runtime.
 2. **Binding availability.** `@ast-grep/napi` provides first-class Node.js bindings via NAPI (N-API). `web-tree-sitter` provides a WASM module with a JavaScript API. Both are most naturally consumed from JavaScript or TypeScript.
@@ -16,7 +16,7 @@ Arborist needs an implementation language that satisfies several constraints:
 
 ## Decision
 
-Implement Arborist in **TypeScript**, targeting **Node.js >= 20**.
+Implement Scissorhands in **TypeScript**, targeting **Node.js >= 20**.
 
 Key implementation guidelines:
 

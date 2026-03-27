@@ -16,7 +16,7 @@ async function run(...args: string[]) {
 let tmpDir: string;
 
 beforeEach(async () => {
-  tmpDir = await mkdtemp(resolve(tmpdir(), 'arborist-test-'));
+  tmpDir = await mkdtemp(resolve(tmpdir(), 'scissorhands-test-'));
 });
 
 afterEach(async () => {

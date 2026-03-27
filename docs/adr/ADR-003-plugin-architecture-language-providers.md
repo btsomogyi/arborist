@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Arborist must support adding new programming languages without modifying the core engine. Each language has distinct characteristics:
+Scissorhands must support adding new programming languages without modifying the core engine. Each language has distinct characteristics:
 
 - Different AST node types and naming conventions (e.g., `function_declaration` in JavaScript vs. `function_definition` in Python).
 - Different semantic concepts (e.g., Python has decorators and list comprehensions; Go has goroutines and defer).
@@ -38,14 +38,14 @@ Providers are registered by language identifier (matching common conventions: `t
 - **Fallback chains** — If an ast-grep provider exists for a language, it is preferred. If not, the tree-sitter provider is used.
 - **Runtime registration** — Third-party packages can register providers at runtime.
 
-Provider packages follow the naming convention `@arborist/lang-{language}` for first-party packages and `arborist-lang-{language}` for community packages.
+Provider packages follow the naming convention `@scissorhands/lang-{language}` for first-party packages and `scissorhands-lang-{language}` for community packages.
 
 ## Consequences
 
 ### Positive
 
 - **Decoupled language knowledge.** The core engine has zero knowledge of any specific language. All language-specific behavior lives in providers.
-- **Third-party extensibility.** Anyone can publish an `arborist-lang-*` package to add support for a new language. No fork or PR to core required.
+- **Third-party extensibility.** Anyone can publish an `scissorhands-lang-*` package to add support for a new language. No fork or PR to core required.
 - **Backend transparency.** Callers do not know or care whether a provider uses ast-grep or tree-sitter internally. The `LanguageProvider` interface is backend-agnostic.
 - **Testable in isolation.** Each provider can be unit-tested independently with language-specific test fixtures.
 - **Incremental language support.** A provider can start with just `parse` and `query`, adding semantic mappings and edit patterns over time.

@@ -1,6 +1,6 @@
-# Arborist Benchmark Results
+# Scissorhands Benchmark Results
 
-Token savings analysis comparing arborist's AST-based editing against the
+Token savings analysis comparing scissorhands's AST-based editing against the
 traditional Read + Edit approach used by AI agents.
 
 ## Running the Benchmarks
@@ -31,14 +31,14 @@ Each benchmark compares two approaches for the same code operation:
 2. Agent reasons about the content to locate change sites
 3. Agent produces one `Edit(old_string, new_string)` call per change
 
-**Arborist (single tool call)**
-1. Agent sends one arborist tool call with a structural pattern
+**Scissorhands (single tool call)**
+1. Agent sends one scissorhands tool call with a structural pattern
 2. Tool returns a concise result — the file content never enters the context
 
 Token counts use the standard ~4 characters/token approximation. The
 traditional approach includes the full file content as input tokens (since
 the agent must read the file), plus output tokens for each Edit call.
-The arborist approach includes only the tool call JSON and a compact result.
+The scissorhands approach includes only the tool call JSON and a compact result.
 
 ## Fixture Files
 
@@ -61,7 +61,7 @@ type definitions, and logging calls — the kind of code agents typically edit.
 | Metric | Value |
 |--------|------:|
 | Traditional approach | 97,671 tokens |
-| Arborist approach | 8,595 tokens |
+| Scissorhands approach | 8,595 tokens |
 | Tokens saved | 89,076 |
 | **Overall reduction** | **91.2%** |
 
@@ -69,12 +69,12 @@ type definitions, and logging calls — the kind of code agents typically edit.
 
 | Tool | Avg Reduction | Explanation |
 |------|-------------:|-------------|
-| `arborist_edit` | 96.3% | One pattern replaces N manual Edit calls; no file read needed |
-| `arborist_rename` | 95.5% | Identifier-safe rename in one call vs N string-match Edits |
-| `arborist_batch` | 94.9% | Atomic multi-op in one call vs sequential Read+Edit cycles |
-| `arborist_query` | 90.7% | Returns only matches vs reading the entire file to search |
-| `arborist_list_symbols` | 77.3% | Compact symbol listing vs full file read |
-| `arborist_parse` | 73.9% | Structured AST summary vs raw file content |
+| `scissorhands_edit` | 96.3% | One pattern replaces N manual Edit calls; no file read needed |
+| `scissorhands_rename` | 95.5% | Identifier-safe rename in one call vs N string-match Edits |
+| `scissorhands_batch` | 94.9% | Atomic multi-op in one call vs sequential Read+Edit cycles |
+| `scissorhands_query` | 90.7% | Returns only matches vs reading the entire file to search |
+| `scissorhands_list_symbols` | 77.3% | Compact symbol listing vs full file read |
+| `scissorhands_parse` | 73.9% | Structured AST summary vs raw file content |
 
 ### Per-Language Savings
 
@@ -89,66 +89,66 @@ type definitions, and logging calls — the kind of code agents typically edit.
 
 #### TypeScript
 
-| Scenario | Tool | Traditional | Arborist | Saved | Reduction |
+| Scenario | Tool | Traditional | Scissorhands | Saved | Reduction |
 |----------|------|----------:|--------:|------:|----------:|
-| parse-file | arborist_parse | 1,738 | 371 | 1,367 | 78.7% |
-| query-print-calls | arborist_query | 1,735 | 480 | 1,255 | 72.3% |
-| query-classes | arborist_query | 1,737 | 77 | 1,660 | 95.6% |
-| query-imports | arborist_query | 1,733 | 82 | 1,651 | 95.3% |
-| replace-print-calls | arborist_edit | 3,192 | 100 | 3,092 | 96.9% |
-| insert-doc-comment | arborist_edit | 1,778 | 100 | 1,678 | 94.4% |
-| remove-print-calls | arborist_edit | 2,797 | 80 | 2,717 | 97.1% |
-| rename-symbol | arborist_rename | 1,856 | 90 | 1,766 | 95.2% |
-| list-symbols | arborist_list_symbols | 1,736 | 477 | 1,259 | 72.5% |
-| batch-rename-remove | arborist_batch | 2,918 | 149 | 2,769 | 94.9% |
+| parse-file | scissorhands_parse | 1,738 | 371 | 1,367 | 78.7% |
+| query-print-calls | scissorhands_query | 1,735 | 480 | 1,255 | 72.3% |
+| query-classes | scissorhands_query | 1,737 | 77 | 1,660 | 95.6% |
+| query-imports | scissorhands_query | 1,733 | 82 | 1,651 | 95.3% |
+| replace-print-calls | scissorhands_edit | 3,192 | 100 | 3,092 | 96.9% |
+| insert-doc-comment | scissorhands_edit | 1,778 | 100 | 1,678 | 94.4% |
+| remove-print-calls | scissorhands_edit | 2,797 | 80 | 2,717 | 97.1% |
+| rename-symbol | scissorhands_rename | 1,856 | 90 | 1,766 | 95.2% |
+| list-symbols | scissorhands_list_symbols | 1,736 | 477 | 1,259 | 72.5% |
+| batch-rename-remove | scissorhands_batch | 2,918 | 149 | 2,769 | 94.9% |
 
 #### Python
 
-| Scenario | Tool | Traditional | Arborist | Saved | Reduction |
+| Scenario | Tool | Traditional | Scissorhands | Saved | Reduction |
 |----------|------|----------:|--------:|------:|----------:|
-| parse-file | arborist_parse | 1,721 | 392 | 1,329 | 77.2% |
-| query-functions | arborist_query | 1,719 | 132 | 1,587 | 92.3% |
-| query-print-calls | arborist_query | 1,718 | 446 | 1,272 | 74.0% |
-| query-classes | arborist_query | 1,720 | 139 | 1,581 | 91.9% |
-| query-imports | arborist_query | 1,716 | 84 | 1,632 | 95.1% |
-| replace-print-calls | arborist_edit | 3,198 | 97 | 3,101 | 97.0% |
-| insert-doc-comment | arborist_edit | 1,760 | 99 | 1,661 | 94.4% |
-| remove-print-calls | arborist_edit | 2,864 | 78 | 2,786 | 97.3% |
-| rename-symbol | arborist_rename | 1,782 | 92 | 1,690 | 94.8% |
-| list-symbols | arborist_list_symbols | 1,719 | 519 | 1,200 | 69.8% |
-| batch-rename-remove | arborist_batch | 2,928 | 149 | 2,779 | 94.9% |
+| parse-file | scissorhands_parse | 1,721 | 392 | 1,329 | 77.2% |
+| query-functions | scissorhands_query | 1,719 | 132 | 1,587 | 92.3% |
+| query-print-calls | scissorhands_query | 1,718 | 446 | 1,272 | 74.0% |
+| query-classes | scissorhands_query | 1,720 | 139 | 1,581 | 91.9% |
+| query-imports | scissorhands_query | 1,716 | 84 | 1,632 | 95.1% |
+| replace-print-calls | scissorhands_edit | 3,198 | 97 | 3,101 | 97.0% |
+| insert-doc-comment | scissorhands_edit | 1,760 | 99 | 1,661 | 94.4% |
+| remove-print-calls | scissorhands_edit | 2,864 | 78 | 2,786 | 97.3% |
+| rename-symbol | scissorhands_rename | 1,782 | 92 | 1,690 | 94.8% |
+| list-symbols | scissorhands_list_symbols | 1,719 | 519 | 1,200 | 69.8% |
+| batch-rename-remove | scissorhands_batch | 2,928 | 149 | 2,779 | 94.9% |
 
 #### Go
 
-| Scenario | Tool | Traditional | Arborist | Saved | Reduction |
+| Scenario | Tool | Traditional | Scissorhands | Saved | Reduction |
 |----------|------|----------:|--------:|------:|----------:|
-| parse-file | arborist_parse | 2,214 | 921 | 1,293 | 58.4% |
-| query-functions | arborist_query | 2,212 | 99 | 2,113 | 95.5% |
-| query-print-calls | arborist_query | 2,211 | 125 | 2,086 | 94.3% |
-| query-classes | arborist_query | 2,213 | 160 | 2,053 | 92.8% |
-| query-imports | arborist_query | 2,209 | 59 | 2,150 | 97.3% |
-| replace-print-calls | arborist_edit | 2,541 | 96 | 2,445 | 96.2% |
-| insert-doc-comment | arborist_edit | 2,258 | 108 | 2,150 | 95.2% |
-| remove-print-calls | arborist_edit | 2,472 | 78 | 2,394 | 96.8% |
-| rename-symbol | arborist_rename | 2,331 | 90 | 2,241 | 96.1% |
-| list-symbols | arborist_list_symbols | 2,212 | 223 | 1,989 | 89.9% |
-| batch-rename-remove | arborist_batch | 2,592 | 147 | 2,445 | 94.3% |
+| parse-file | scissorhands_parse | 2,214 | 921 | 1,293 | 58.4% |
+| query-functions | scissorhands_query | 2,212 | 99 | 2,113 | 95.5% |
+| query-print-calls | scissorhands_query | 2,211 | 125 | 2,086 | 94.3% |
+| query-classes | scissorhands_query | 2,213 | 160 | 2,053 | 92.8% |
+| query-imports | scissorhands_query | 2,209 | 59 | 2,150 | 97.3% |
+| replace-print-calls | scissorhands_edit | 2,541 | 96 | 2,445 | 96.2% |
+| insert-doc-comment | scissorhands_edit | 2,258 | 108 | 2,150 | 95.2% |
+| remove-print-calls | scissorhands_edit | 2,472 | 78 | 2,394 | 96.8% |
+| rename-symbol | scissorhands_rename | 2,331 | 90 | 2,241 | 96.1% |
+| list-symbols | scissorhands_list_symbols | 2,212 | 223 | 1,989 | 89.9% |
+| batch-rename-remove | scissorhands_batch | 2,592 | 147 | 2,445 | 94.3% |
 
 #### Rust
 
-| Scenario | Tool | Traditional | Arborist | Saved | Reduction |
+| Scenario | Tool | Traditional | Scissorhands | Saved | Reduction |
 |----------|------|----------:|--------:|------:|----------:|
-| parse-file | arborist_parse | 2,223 | 414 | 1,809 | 81.4% |
-| query-functions | arborist_query | 2,221 | 122 | 2,099 | 94.5% |
-| query-print-calls | arborist_query | 2,220 | 447 | 1,773 | 79.9% |
-| query-classes | arborist_query | 2,222 | 143 | 2,079 | 93.6% |
-| query-imports | arborist_query | 2,218 | 91 | 2,127 | 95.9% |
-| replace-print-calls | arborist_edit | 3,662 | 98 | 3,564 | 97.3% |
-| insert-doc-comment | arborist_edit | 2,262 | 104 | 2,158 | 95.4% |
-| remove-print-calls | arborist_edit | 3,271 | 79 | 3,192 | 97.6% |
-| rename-symbol | arborist_rename | 2,285 | 92 | 2,193 | 96.0% |
-| list-symbols | arborist_list_symbols | 2,221 | 516 | 1,705 | 76.8% |
-| batch-rename-remove | arborist_batch | 3,336 | 150 | 3,186 | 95.5% |
+| parse-file | scissorhands_parse | 2,223 | 414 | 1,809 | 81.4% |
+| query-functions | scissorhands_query | 2,221 | 122 | 2,099 | 94.5% |
+| query-print-calls | scissorhands_query | 2,220 | 447 | 1,773 | 79.9% |
+| query-classes | scissorhands_query | 2,222 | 143 | 2,079 | 93.6% |
+| query-imports | scissorhands_query | 2,218 | 91 | 2,127 | 95.9% |
+| replace-print-calls | scissorhands_edit | 3,662 | 98 | 3,564 | 97.3% |
+| insert-doc-comment | scissorhands_edit | 2,262 | 104 | 2,158 | 95.4% |
+| remove-print-calls | scissorhands_edit | 3,271 | 79 | 3,192 | 97.6% |
+| rename-symbol | scissorhands_rename | 2,285 | 92 | 2,193 | 96.0% |
+| list-symbols | scissorhands_list_symbols | 2,221 | 516 | 1,705 | 76.8% |
+| batch-rename-remove | scissorhands_batch | 3,336 | 150 | 3,186 | 95.5% |
 
 ## Scenarios Tested
 
@@ -157,17 +157,17 @@ if the function-declaration pattern matches):
 
 | # | Scenario | Tool | Operation |
 |---|----------|------|-----------|
-| 1 | parse-file | `arborist_parse` | Parse file, return depth-limited AST summary |
-| 2 | query-functions | `arborist_query` | Find all function declarations |
-| 3 | query-print-calls | `arborist_query` | Find all print/log call sites |
-| 4 | query-classes | `arborist_query` | Find all class/struct declarations |
-| 5 | query-imports | `arborist_query` | Find all import statements |
-| 6 | replace-print-calls | `arborist_edit` | Replace print/log calls with logger |
-| 7 | insert-doc-comment | `arborist_edit` | Insert documentation before a function |
-| 8 | remove-print-calls | `arborist_edit` | Remove all print/log statements |
-| 9 | rename-symbol | `arborist_rename` | Rename a function across the file |
-| 10 | list-symbols | `arborist_list_symbols` | List functions and classes |
-| 11 | batch-rename-remove | `arborist_batch` | Atomic rename + remove in one call |
+| 1 | parse-file | `scissorhands_parse` | Parse file, return depth-limited AST summary |
+| 2 | query-functions | `scissorhands_query` | Find all function declarations |
+| 3 | query-print-calls | `scissorhands_query` | Find all print/log call sites |
+| 4 | query-classes | `scissorhands_query` | Find all class/struct declarations |
+| 5 | query-imports | `scissorhands_query` | Find all import statements |
+| 6 | replace-print-calls | `scissorhands_edit` | Replace print/log calls with logger |
+| 7 | insert-doc-comment | `scissorhands_edit` | Insert documentation before a function |
+| 8 | remove-print-calls | `scissorhands_edit` | Remove all print/log statements |
+| 9 | rename-symbol | `scissorhands_rename` | Rename a function across the file |
+| 10 | list-symbols | `scissorhands_list_symbols` | List functions and classes |
+| 11 | batch-rename-remove | `scissorhands_batch` | Atomic rename + remove in one call |
 
 ## Notes
 
@@ -183,5 +183,5 @@ if the function-declaration pattern matches):
 
 - **Token estimates scale with file size**: These fixtures are 200-330 lines.
   On larger files (1,000+ lines), the traditional approach's token cost grows
-  linearly (the agent must read the entire file), while arborist's cost stays
+  linearly (the agent must read the entire file), while scissorhands's cost stays
   nearly constant. The savings percentage increases with file size.

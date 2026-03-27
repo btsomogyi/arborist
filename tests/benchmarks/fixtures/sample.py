@@ -1,4 +1,4 @@
-"""Sample Python module for benchmarking arborist AST operations."""
+"""Sample Python module for benchmarking scissorhands AST operations."""
 
 import os
 import sys

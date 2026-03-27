@@ -6,7 +6,7 @@ import '../../languages/index.js';
 
 export function registerRenameTool(server: McpServer): void {
   server.tool(
-    'arborist_rename',
+    'scissorhands_rename',
     'Rename a symbol across a file (identifier-safe, not substring replacement)',
     renameInputSchema.shape,
     async (input) => {

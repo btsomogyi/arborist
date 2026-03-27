@@ -1,8 +1,8 @@
-# Arborist MVP: Complete Implementation Plan
+# Scissorhands MVP: Complete Implementation Plan
 
 ## Overview
 
-This document is the step-by-step implementation plan for the Arborist MVP -- an
+This document is the step-by-step implementation plan for the Scissorhands MVP -- an
 AST-based polyglot code editor for AI agents. It covers project setup, core
 engine, language providers, high-level operations, CLI, MCP server, Claude Code
 skill creation, test fixtures, and final validation.
@@ -29,7 +29,7 @@ skill creation, test fixtures, and final validation.
 ## Directory Structure (Target State)
 
 ```
-arborist/
+scissorhands/
   src/
     core/
       types.ts
@@ -118,7 +118,7 @@ arborist/
         indentation.py
   .claude/
     skills/
-      arborist.md
+      scissorhands.md
 ```
 
 ---
@@ -137,14 +137,14 @@ and directory scaffolding. After this phase, `npm run build`, `npm test`, and
 
 ```json
 {
-  "name": "arborist",
+  "name": "scissorhands",
   "version": "0.1.0",
   "description": "AST-based polyglot code editor for AI agents",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "arborist": "./dist/cli/index.js"
+    "scissorhands": "./dist/cli/index.js"
   },
   "exports": {
     ".": {
@@ -506,7 +506,7 @@ export type EditOperation =
   | Remove
   | RawEdit;
 
-export interface ArboristEdit {
+export interface ScissorhandsEdit {
   file: string;
   operation: EditOperation;
 }
@@ -572,32 +572,32 @@ export interface BatchEditResult {
 Custom error hierarchy with structured error codes for agent-friendly messages.
 
 ```typescript
-export class ArboristError extends Error {
+export class ScissorhandsError extends Error {
   constructor(
     message: string,
     public readonly code: string,
     public readonly details?: Record<string, unknown>
   ) {
     super(message);
-    this.name = 'ArboristError';
+    this.name = 'ScissorhandsError';
   }
 }
 
-export class ParseError extends ArboristError {
+export class ParseError extends ScissorhandsError {
   constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'PARSE_ERROR', details);
     this.name = 'ParseError';
   }
 }
 
-export class QueryError extends ArboristError {
+export class QueryError extends ScissorhandsError {
   constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'QUERY_ERROR', details);
     this.name = 'QueryError';
   }
 }
 
-export class EditError extends ArboristError {
+export class EditError extends ScissorhandsError {
   constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'EDIT_ERROR', details);
     this.name = 'EditError';
@@ -611,21 +611,21 @@ export class EditConflictError extends EditError {
   }
 }
 
-export class ProviderError extends ArboristError {
+export class ProviderError extends ScissorhandsError {
   constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'PROVIDER_ERROR', details);
     this.name = 'ProviderError';
   }
 }
 
-export class ValidationError extends ArboristError {
+export class ValidationError extends ScissorhandsError {
   constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'VALIDATION_ERROR', details);
     this.name = 'ValidationError';
   }
 }
 
-export class FileError extends ArboristError {
+export class FileError extends ScissorhandsError {
   constructor(message: string, details?: Record<string, unknown>) {
     super(message, 'FILE_ERROR', details);
     this.name = 'FileError';
@@ -684,7 +684,7 @@ Coverage:
 Coverage:
 - Each error class sets the correct `name`, `code`, and `message`
 - `details` bag is accessible
-- Errors are `instanceof` their parent class and `ArboristError`
+- Errors are `instanceof` their parent class and `ScissorhandsError`
 
 ### Success Criteria
 
@@ -1452,7 +1452,7 @@ import { registerProvidersCommand } from './commands/providers.js';
 const program = new Command();
 
 program
-  .name('arborist')
+  .name('scissorhands')
   .description('AST-based polyglot code editor for AI agents')
   .version(version)
   .option('--json', 'Output in JSON format')
@@ -1476,7 +1476,7 @@ program.parse();
 #### 6.2 `src/cli/commands/parse.ts`
 
 ```
-arborist parse <file> [--depth N] [--json] [--node-types type1,type2]
+scissorhands parse <file> [--depth N] [--json] [--node-types type1,type2]
 ```
 
 - Parses the file and outputs the AST structure
@@ -1488,7 +1488,7 @@ arborist parse <file> [--depth N] [--json] [--node-types type1,type2]
 #### 6.3 `src/cli/commands/query.ts`
 
 ```
-arborist query <file> --pattern <pattern> [--language <lang>] [--json]
+scissorhands query <file> --pattern <pattern> [--language <lang>] [--json]
 ```
 
 - Queries the file for matches
@@ -1500,10 +1500,10 @@ arborist query <file> --pattern <pattern> [--language <lang>] [--json]
 #### 6.4 `src/cli/commands/edit.ts`
 
 ```
-arborist edit <file> --replace --pattern <p> --with <r> [--match-index N] [--scope <s>] [--dry-run]
-arborist edit <file> --rename --from <old> --to <new> [--scope <s>] [--dry-run]
-arborist edit <file> --insert --anchor <a> --position <pos> --content <c> [--dry-run]
-arborist edit <file> --remove --pattern <p> [--match-index N] [--dry-run]
+scissorhands edit <file> --replace --pattern <p> --with <r> [--match-index N] [--scope <s>] [--dry-run]
+scissorhands edit <file> --rename --from <old> --to <new> [--scope <s>] [--dry-run]
+scissorhands edit <file> --insert --anchor <a> --position <pos> --content <c> [--dry-run]
+scissorhands edit <file> --remove --pattern <p> [--match-index N] [--dry-run]
 ```
 
 - `--dry-run`: Show a unified diff of what would change without writing to disk
@@ -1522,10 +1522,10 @@ arborist edit <file> --remove --pattern <p> [--match-index N] [--dry-run]
 #### 6.5 `src/cli/commands/apply.ts`
 
 ```
-arborist apply <edits.json> [--dry-run]
+scissorhands apply <edits.json> [--dry-run]
 ```
 
-- Reads a JSON file containing an array of `ArboristEdit` objects
+- Reads a JSON file containing an array of `ScissorhandsEdit` objects
 - Validates the JSON against the zod schema
 - Applies all edits atomically (all succeed or none are applied)
 - `--dry-run`: show diffs for all files without writing
@@ -1549,7 +1549,7 @@ arborist apply <edits.json> [--dry-run]
 #### 6.6 `src/cli/commands/providers.ts`
 
 ```
-arborist providers list [--json]
+scissorhands providers list [--json]
 ```
 
 - Lists all registered language providers with their extensions and
@@ -1566,29 +1566,29 @@ machine-readable JSON.
 
 #### `tests/integration/cli/parse.test.ts`
 
-- `arborist parse fixture.ts` produces correct output
-- `arborist parse fixture.ts --json` produces valid JSON
-- `arborist parse fixture.ts --depth 2` truncates correctly
-- `arborist parse nonexistent.ts` exits with error code 1
+- `scissorhands parse fixture.ts` produces correct output
+- `scissorhands parse fixture.ts --json` produces valid JSON
+- `scissorhands parse fixture.ts --depth 2` truncates correctly
+- `scissorhands parse nonexistent.ts` exits with error code 1
 
 #### `tests/integration/cli/query.test.ts`
 
-- `arborist query fixture.ts --pattern "function $NAME"` finds functions
+- `scissorhands query fixture.ts --pattern "function $NAME"` finds functions
 - `--json` output is parseable
 - Non-matching pattern produces empty results (not an error)
 - Missing `--pattern` flag exits with error
 
 #### `tests/integration/cli/edit.test.ts`
 
-- `arborist edit fixture.ts --replace --pattern "old" --with "new" --dry-run`
+- `scissorhands edit fixture.ts --replace --pattern "old" --with "new" --dry-run`
   outputs a diff and does NOT modify the file
-- `arborist edit fixture.ts --rename --from "x" --to "y"` modifies the file
+- `scissorhands edit fixture.ts --rename --from "x" --to "y"` modifies the file
   (use a temp copy of the fixture)
 - `--dry-run` flag prevents file writes in all edit modes
 
 #### `tests/integration/cli/apply.test.ts`
 
-- `arborist apply edits.json` applies batch edits
+- `scissorhands apply edits.json` applies batch edits
 - Invalid JSON produces a clear validation error
 - `--dry-run` shows diffs without writing
 
@@ -1604,8 +1604,8 @@ do not modify the original fixtures.
 3. `--dry-run` never modifies files (verified by comparing file mtime/hash
    before and after)
 4. Error cases produce non-zero exit codes and helpful messages
-5. `npx arborist --help` shows all commands and options
-6. `npx arborist --version` shows the correct version
+5. `npx scissorhands --help` shows all commands and options
+6. `npx scissorhands --version` shows the correct version
 
 ### Dependencies on Previous Phases
 
@@ -1619,7 +1619,7 @@ do not modify the original fixtures.
 
 ### Objective
 
-Build the MCP server that exposes Arborist's capabilities as tools that Claude
+Build the MCP server that exposes Scissorhands's capabilities as tools that Claude
 Code (or any MCP client) can invoke. Uses `@modelcontextprotocol/sdk` with
 stdio transport.
 
@@ -1635,7 +1635,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
 const server = new McpServer({
-  name: 'arborist',
+  name: 'scissorhands',
   version: '0.1.0',
 });
 
@@ -1658,7 +1658,7 @@ await server.connect(transport);
   debug logging if needed.
 - The server must handle errors gracefully and return structured error
   responses rather than crashing. Wrap each tool handler in a try/catch
-  that converts `ArboristError` instances to MCP error responses.
+  that converts `ScissorhandsError` instances to MCP error responses.
 - File paths in MCP tool inputs may be relative or absolute. Resolve them
   relative to the working directory (`process.cwd()`).
 
@@ -1737,7 +1737,7 @@ export const renameInputSchema = z.object({
 
 #### 7.3 `src/mcp/tools/parse-tool.ts`
 
-**Tool: `arborist_parse`**
+**Tool: `scissorhands_parse`**
 
 - Input: `{ file, depth?, nodeTypes? }`
 - Output: `{ file, language, root (truncated AST), sourceLength, lineCount }`
@@ -1746,7 +1746,7 @@ export const renameInputSchema = z.object({
 
 #### 7.4 `src/mcp/tools/query-tool.ts`
 
-**Tool: `arborist_query`**
+**Tool: `scissorhands_query`**
 
 - Input: `{ file, pattern, language? }`
 - Output: `{ file, language, matches: QueryMatch[], matchCount }`
@@ -1754,7 +1754,7 @@ export const renameInputSchema = z.object({
 
 #### 7.5 `src/mcp/tools/edit-tool.ts`
 
-**Tool: `arborist_edit`**
+**Tool: `scissorhands_edit`**
 
 - Input: `{ file, operation, dryRun? }`
 - Output: `{ file, editCount, changes, syntaxValid, diff? }`
@@ -1763,16 +1763,16 @@ export const renameInputSchema = z.object({
 
 #### 7.6 `src/mcp/tools/batch-tool.ts`
 
-**Tool: `arborist_batch`**
+**Tool: `scissorhands_batch`**
 
-- Input: `{ edits: ArboristEdit[], dryRun? }`
+- Input: `{ edits: ScissorhandsEdit[], dryRun? }`
 - Output: `{ results, totalEdits, filesModified, allSucceeded, errors }`
 - Atomic: if any edit fails, none are written to disk
 - Each edit in the batch is validated independently
 
 #### 7.7 `src/mcp/tools/list-symbols-tool.ts`
 
-**Tool: `arborist_list_symbols`**
+**Tool: `scissorhands_list_symbols`**
 
 - Input: `{ file, symbolTypes? }`
 - Output: `{ file, language, symbols: Array<{ name, type, range, signature }> }`
@@ -1782,10 +1782,10 @@ export const renameInputSchema = z.object({
 
 #### 7.8 `src/mcp/tools/rename-tool.ts`
 
-**Tool: `arborist_rename`**
+**Tool: `scissorhands_rename`**
 
 - Input: `{ file, from, to, scope?, dryRun? }`
-- Output: same as `arborist_edit`
+- Output: same as `scissorhands_edit`
 - Convenience wrapper around the rename operation
 
 ### Test Files
@@ -1811,12 +1811,12 @@ and test them as functions, or use an in-memory transport.
 
 ### `.mcp.json` Update
 
-Add the arborist server entry alongside the existing servers:
+Add the scissorhands server entry alongside the existing servers:
 
 ```json
 {
   "mcpServers": {
-    "arborist": {
+    "scissorhands": {
       "command": "node",
       "args": ["./dist/mcp/server.js"],
       "env": {}
@@ -1825,7 +1825,7 @@ Add the arborist server entry alongside the existing servers:
 }
 ```
 
-This entry tells Claude Code how to start the arborist MCP server. The
+This entry tells Claude Code how to start the scissorhands MCP server. The
 `command` points to the built server file. For development, use
 `npx tsx src/mcp/server.ts` instead.
 
@@ -1852,24 +1852,24 @@ This entry tells Claude Code how to start the arborist MCP server. The
 ### Objective
 
 Create the Claude Code skill definition that teaches Claude when and how to
-use the arborist MCP tools, including pattern examples and decision criteria
-for when arborist is the right tool versus the built-in Edit tool.
+use the scissorhands MCP tools, including pattern examples and decision criteria
+for when scissorhands is the right tool versus the built-in Edit tool.
 
 ### Files to Create/Edit
 
-#### 8.1 `.claude/skills/arborist.md`
+#### 8.1 `.claude/skills/scissorhands.md`
 
 ```markdown
 ---
-name: arborist
+name: scissorhands
 description: AST-based structural code editing for targeted, formatting-preserving changes
 tools:
-  - arborist_parse
-  - arborist_query
-  - arborist_edit
-  - arborist_batch
-  - arborist_list_symbols
-  - arborist_rename
+  - scissorhands_parse
+  - scissorhands_query
+  - scissorhands_edit
+  - scissorhands_batch
+  - scissorhands_list_symbols
+  - scissorhands_rename
 triggers:
   - "structural edit"
   - "rename symbol"
@@ -1880,15 +1880,15 @@ triggers:
   - "code pattern"
 ---
 
-# Arborist: Structural Code Editor
+# Scissorhands: Structural Code Editor
 
-Arborist provides AST-aware code editing that preserves formatting,
+Scissorhands provides AST-aware code editing that preserves formatting,
 comments, and whitespace. Use it for targeted structural changes where
 precision matters.
 
-## When to Use Arborist vs Built-in Tools
+## When to Use Scissorhands vs Built-in Tools
 
-### Use Arborist When:
+### Use Scissorhands When:
 - Renaming a symbol across a file (changes only identifier nodes, not substrings)
 - Replacing a structural pattern (e.g., all `console.log(X)` -> `logger.info(X)`)
 - Inserting code at a structurally meaningful location (before/after a function)
@@ -1909,7 +1909,7 @@ precision matters.
 
 ## Pattern Syntax
 
-Arborist uses code-native patterns. Write the pattern in the same language
+Scissorhands uses code-native patterns. Write the pattern in the same language
 as the code you are editing.
 
 ### TypeScript/JavaScript Examples
@@ -1943,7 +1943,7 @@ as the code you are editing.
 ### Query for functions
 ```json
 {
-  "tool": "arborist_query",
+  "tool": "scissorhands_query",
   "input": {
     "file": "src/auth.ts",
     "pattern": "function $NAME($$$PARAMS) { $$$BODY }"
@@ -1954,7 +1954,7 @@ as the code you are editing.
 ### Rename a symbol
 ```json
 {
-  "tool": "arborist_rename",
+  "tool": "scissorhands_rename",
   "input": {
     "file": "src/auth.ts",
     "from": "isValid",
@@ -1966,7 +1966,7 @@ as the code you are editing.
 ### Structural replace
 ```json
 {
-  "tool": "arborist_edit",
+  "tool": "scissorhands_edit",
   "input": {
     "file": "src/auth.ts",
     "operation": {
@@ -1981,7 +1981,7 @@ as the code you are editing.
 ### Insert a JSDoc comment before a function
 ```json
 {
-  "tool": "arborist_edit",
+  "tool": "scissorhands_edit",
   "input": {
     "file": "src/auth.ts",
     "operation": {
@@ -1997,7 +1997,7 @@ as the code you are editing.
 ### Remove all console.log calls
 ```json
 {
-  "tool": "arborist_edit",
+  "tool": "scissorhands_edit",
   "input": {
     "file": "src/auth.ts",
     "operation": {
@@ -2011,7 +2011,7 @@ as the code you are editing.
 ### Batch edit (atomic)
 ```json
 {
-  "tool": "arborist_batch",
+  "tool": "scissorhands_batch",
   "input": {
     "edits": [
       {
@@ -2030,7 +2030,7 @@ as the code you are editing.
 ### List all symbols in a file
 ```json
 {
-  "tool": "arborist_list_symbols",
+  "tool": "scissorhands_list_symbols",
   "input": {
     "file": "src/auth.ts",
     "symbolTypes": ["function", "class"]
@@ -2052,12 +2052,12 @@ with an EDIT_CONFLICT error.
 
 #### 8.2 `.mcp.json` Update
 
-Merge the arborist MCP server entry into the existing `.mcp.json`:
+Merge the scissorhands MCP server entry into the existing `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "arborist": {
+    "scissorhands": {
       "command": "node",
       "args": ["./dist/mcp/server.js"],
       "env": {}
@@ -2070,12 +2070,12 @@ Merge the arborist MCP server entry into the existing `.mcp.json`:
 
 No automated tests for the skill file itself. Validation is manual:
 
-1. Start Claude Code in the arborist project directory
-2. Verify the arborist MCP server starts (check `tools/list`)
+1. Start Claude Code in the scissorhands project directory
+2. Verify the scissorhands MCP server starts (check `tools/list`)
 3. Ask Claude to "list all functions in src/core/language-registry.ts"
-   and verify it uses `arborist_list_symbols` or `arborist_query`
+   and verify it uses `scissorhands_list_symbols` or `scissorhands_query`
 4. Ask Claude to "rename `get` to `getProvider` in
-   src/core/language-registry.ts" and verify it uses `arborist_rename`
+   src/core/language-registry.ts" and verify it uses `scissorhands_rename`
 5. Verify the skill triggers on phrases like "structural edit",
    "rename symbol", and "find pattern"
 
@@ -2084,7 +2084,7 @@ No automated tests for the skill file itself. Validation is manual:
 1. The skill file is valid YAML frontmatter + markdown
 2. The `.mcp.json` entry correctly points to the built server
 3. Claude Code loads the skill and MCP server without errors
-4. Claude uses arborist tools when appropriate (manual verification)
+4. Claude uses scissorhands tools when appropriate (manual verification)
 5. Pattern examples in the skill file are correct and functional
 
 ### Dependencies on Previous Phases
@@ -2166,7 +2166,7 @@ acceptance criteria for the MVP.
 3. Verify: the file on disk is NOT modified (compare hash before/after)
 
 **Scenario 11: Dry-Run via CLI**
-1. Run `arborist edit --dry-run` on a fixture
+1. Run `scissorhands edit --dry-run` on a fixture
 2. Verify: stdout contains a unified diff
 3. Verify: the file is NOT modified
 
@@ -2191,37 +2191,37 @@ acceptance criteria for the MVP.
 #### 9.5 `tests/e2e/mcp-tools.test.ts`
 
 **Scenario 14: MCP Parse Tool**
-1. Invoke `arborist_parse` via the MCP handler
+1. Invoke `scissorhands_parse` via the MCP handler
 2. Verify: response has correct structure (file, language, root, lineCount)
 
 **Scenario 15: MCP Query Tool**
-1. Invoke `arborist_query` with a pattern
+1. Invoke `scissorhands_query` with a pattern
 2. Verify: matches are returned with correct structure
 
 **Scenario 16: MCP Edit Tool**
-1. Invoke `arborist_edit` with `dryRun: true`
+1. Invoke `scissorhands_edit` with `dryRun: true`
 2. Verify: diff is returned, file is not modified
 
 **Scenario 17: MCP Batch Tool**
-1. Invoke `arborist_batch` with two edits
+1. Invoke `scissorhands_batch` with two edits
 2. Verify: both edits applied successfully
 
 **Scenario 18: MCP List Symbols Tool**
-1. Invoke `arborist_list_symbols` on a TypeScript fixture
+1. Invoke `scissorhands_list_symbols` on a TypeScript fixture
 2. Verify: functions, classes, and imports are listed
 
 #### 9.6 `tests/e2e/cli-invocation.test.ts`
 
 **Scenario 19: CLI Parse**
-1. Run `arborist parse fixture.ts --json`
+1. Run `scissorhands parse fixture.ts --json`
 2. Verify: valid JSON output, correct structure
 
 **Scenario 20: CLI Query**
-1. Run `arborist query fixture.ts --pattern "function $NAME"`
+1. Run `scissorhands query fixture.ts --pattern "function $NAME"`
 2. Verify: matches listed in stdout
 
 **Scenario 21: CLI Edit (dry-run)**
-1. Run `arborist edit fixture.ts --replace --pattern "old" --with "new" --dry-run`
+1. Run `scissorhands edit fixture.ts --replace --pattern "old" --with "new" --dry-run`
 2. Verify: unified diff in stdout, file unchanged
 
 ### Success Criteria
@@ -2303,18 +2303,18 @@ node dist/mcp/server.js
 Verify using the MCP inspector or by piping JSON-RPC messages:
 - `initialize` handshake succeeds
 - `tools/list` returns all 6 tools
-- `tools/call` with `arborist_parse` returns correct output
+- `tools/call` with `scissorhands_parse` returns correct output
 
 #### 10.4 Skill Verification
 
-1. Open the arborist project in Claude Code
-2. Verify `.mcp.json` is loaded (arborist server appears in MCP list)
-3. Verify `.claude/skills/arborist.md` is loaded
+1. Open the scissorhands project in Claude Code
+2. Verify `.mcp.json` is loaded (scissorhands server appears in MCP list)
+3. Verify `.claude/skills/scissorhands.md` is loaded
 4. Test natural language triggers:
    - "Parse src/core/types.ts and show me the functions"
    - "Rename the `get` method to `getProvider` in language-registry.ts"
    - "Replace all console.log calls with logger.info in parser.ts"
-5. Verify Claude uses arborist tools (not built-in Edit) for these tasks
+5. Verify Claude uses scissorhands tools (not built-in Edit) for these tasks
 
 #### 10.5 Final Checks
 
@@ -2331,7 +2331,7 @@ Verify using the MCP inspector or by piping JSON-RPC messages:
 ### Success Criteria
 
 1. `npm pack` produces a clean, publishable package
-2. `npx arborist --help` works from a clean install
+2. `npx scissorhands --help` works from a clean install
 3. MCP server starts and responds to tool calls
 4. Claude Code skill triggers correctly (manual verification)
 5. All automated tests pass

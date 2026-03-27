@@ -9,7 +9,7 @@ import { registerRenameTool } from './tools/rename-tool.js';
 import '../languages/index.js';
 
 const server = new McpServer({
-  name: 'arborist',
+  name: 'scissorhands',
   version: '0.1.0',
 });
 

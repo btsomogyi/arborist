@@ -17,7 +17,7 @@ let tmpDir: string;
 let tmpFile: string;
 
 beforeEach(async () => {
-  tmpDir = await mkdtemp(resolve(tmpdir(), 'arborist-test-'));
+  tmpDir = await mkdtemp(resolve(tmpdir(), 'scissorhands-test-'));
   tmpFile = resolve(tmpDir, 'test.ts');
   const content = await readFile(FIXTURE, 'utf-8');
   await writeFile(tmpFile, content);

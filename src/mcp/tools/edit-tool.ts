@@ -6,7 +6,7 @@ import '../../languages/index.js';
 
 export function registerEditTool(server: McpServer): void {
   server.tool(
-    'arborist_edit',
+    'scissorhands_edit',
     'Apply a structural edit (replace, rename, insert, or remove) to a source file',
     editInputSchema.shape,
     async (input) => {

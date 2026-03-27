@@ -1,10 +1,10 @@
-# Arborist
+# Scissorhands
 
 AST-based polyglot source code editor for AI agent metaprogramming.
 
 ## Overview
 
-Arborist gives AI agents (Claude Code skills, MCP tools, CLI) the ability to perform **targeted, structure-aware edits** to source code files across multiple programming languages. Instead of rewriting entire files, agents locate specific AST nodes using code-native patterns and apply surgical edits that preserve all surrounding formatting, comments, and whitespace.
+Scissorhands gives AI agents (Claude Code skills, MCP tools, CLI) the ability to perform **targeted, structure-aware edits** to source code files across multiple programming languages. Instead of rewriting entire files, agents locate specific AST nodes using code-native patterns and apply surgical edits that preserve all surrounding formatting, comments, and whitespace.
 
 **Core engine**: [`@ast-grep/napi`](https://ast-grep.github.io/) (Rust/NAPI, built on tree-sitter) with [`web-tree-sitter`](https://github.com/tree-sitter/tree-sitter) fallback for extended language coverage.
 
@@ -22,9 +22,9 @@ Arborist gives AI agents (Claude Code skills, MCP tools, CLI) the ability to per
 |----------|---------|--------|
 | TypeScript/JavaScript/JSX/TSX | ast-grep | Implemented |
 | Python | ast-grep | Implemented |
-| Go | ast-grep | Phase 2 |
-| Rust | ast-grep | Phase 2 |
-| 170+ others | web-tree-sitter | Phase 2 |
+| Go | ast-grep | Implemented |
+| Rust | ast-grep | Implemented |
+| 170+ others | web-tree-sitter | Planned |
 
 ## Milestones
 
@@ -38,17 +38,17 @@ Arborist gives AI agents (Claude Code skills, MCP tools, CLI) the ability to per
 | 5 | Language providers (TypeScript/JS/TSX/JSX + Python) | Done |
 | 6 | High-level operations (replace, rename, insert, remove) | Done |
 | 7 | CLI interface (parse, query, edit, apply, providers commands) | Done |
-| 8 | MCP server (arborist_parse, arborist_query, arborist_edit, arborist_batch, arborist_list_symbols, arborist_rename) | Done |
-| 9 | Claude Code skill (skill definition, trigger conditions, examples) | Planned |
-| 10 | E2E validation & ship (fixtures, 21 test scenarios, npm publish) | In Progress |
+| 8 | MCP server (scissorhands_parse, scissorhands_query, scissorhands_edit, scissorhands_batch, scissorhands_list_symbols, scissorhands_rename) | Done |
+| 9 | Claude Code skill (skill definition, trigger conditions, examples) | Done |
+| 10 | E2E validation (fixtures, 21 test scenarios, npm publish) | Done |
 
 ## Language Support & Update Cadence
 
-Arborist's language support derives from two upstream ecosystems:
+Scissorhands's language support derives from two upstream ecosystems:
 
 - **ast-grep** (MVP backend): Releases every ~2-4 weeks. Vendors tree-sitter grammars as Rust crate dependencies. Grammar updates flow through when the ast-grep maintainer bumps deps — reactive, not on a fixed schedule. Covers ~22 built-in languages including all major ones (TS, Python, Go, Rust, Java, C/C++, C#, Kotlin, Swift, Ruby, etc.). [Custom language support](https://ast-grep.github.io/advanced/custom-language.html) available via dynamic loading of any tree-sitter grammar.
 
-- **tree-sitter** (Phase 2 fallback): 170+ community-maintained grammars. Individual grammars are updated independently by their maintainers — major languages (Python, TypeScript, Go, Rust) receive updates within days/weeks of language releases. Grammars ship as `.wasm` files loaded at runtime, so arborist can adopt bleeding-edge grammar updates without waiting for ast-grep releases.
+- **tree-sitter** (Phase 2 fallback): 170+ community-maintained grammars. Individual grammars are updated independently by their maintainers — major languages (Python, TypeScript, Go, Rust) receive updates within days/weeks of language releases. Grammars ship as `.wasm` files loaded at runtime, so scissorhands can adopt bleeding-edge grammar updates without waiting for ast-grep releases.
 
 **Risk mitigation**: If a new language syntax feature (e.g., Python 3.14 syntax) isn't yet in ast-grep's vendored grammar, the Phase 2 web-tree-sitter fallback can load the latest `.wasm` grammar directly.
 
@@ -75,16 +75,16 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full system design.
 
 ```bash
 # Install
-npm install arborist
+npm install scissorhands
 
 # CLI usage
-npx arborist parse src/index.ts --depth 3
-npx arborist query src/index.ts -p 'console.log($MSG)'
-npx arborist edit src/index.ts --replace -p 'console.log($MSG)' -w 'logger.info($MSG)' --dry-run
-npx arborist providers
+npx scissorhands parse src/index.ts --depth 3
+npx scissorhands query src/index.ts -p 'console.log($MSG)'
+npx scissorhands edit src/index.ts --replace -p 'console.log($MSG)' -w 'logger.info($MSG)' --dry-run
+npx scissorhands providers
 
 # MCP server
-npx arborist-mcp
+npx scissorhands-mcp
 ```
 
 ## Library API
@@ -96,7 +96,7 @@ import {
   applyEdit, applyEditToSource,
   structuralReplace, renameSymbol, insertContent, removeNode,
   registerBuiltinProviders, registry,
-} from 'arborist';
+} from 'scissorhands';
 
 // Register language providers
 registerBuiltinProviders();
@@ -140,26 +140,26 @@ const cleaned = applyEditToSource(source, 'typescript', {
 
 | Command | Description |
 |---------|-------------|
-| `arborist parse <file>` | Parse file and display AST structure |
-| `arborist query <file> -p <pattern>` | Search for AST pattern matches |
-| `arborist edit <file> --replace\|--rename\|--insert\|--remove` | Apply structural edits |
-| `arborist apply <json>` | Apply edits from JSON config |
-| `arborist providers` | List registered language providers |
+| `scissorhands parse <file>` | Parse file and display AST structure |
+| `scissorhands query <file> -p <pattern>` | Search for AST pattern matches |
+| `scissorhands edit <file> --replace\|--rename\|--insert\|--remove` | Apply structural edits |
+| `scissorhands apply <json>` | Apply edits from JSON config |
+| `scissorhands providers` | List registered language providers |
 
 ## MCP Tools
 
 | Tool | Description |
 |------|-------------|
-| `arborist_parse` | Parse file and return AST |
-| `arborist_query` | Query file for pattern matches |
-| `arborist_edit` | Apply a structural edit |
-| `arborist_batch` | Apply multiple edits atomically |
-| `arborist_list_symbols` | Extract function/class/variable definitions |
-| `arborist_rename` | Rename a symbol across a file |
+| `scissorhands_parse` | Parse file and return AST |
+| `scissorhands_query` | Query file for pattern matches |
+| `scissorhands_edit` | Apply a structural edit |
+| `scissorhands_batch` | Apply multiple edits atomically |
+| `scissorhands_list_symbols` | Extract function/class/variable definitions |
+| `scissorhands_rename` | Rename a symbol across a file |
 
 ## Benchmarks
 
-The benchmark suite exercises all six MCP tools across TypeScript, Python, Go, and Rust, measuring token savings compared to the traditional Read+Edit approach. The primary metric is the reduction in context-window tokens achieved by using Arborist's pattern-based edits (a single tool call with a structural pattern) versus reading the entire file and issuing multiple edit calls. See [`tests/benchmarks/benchmark.test.ts`](tests/benchmarks/benchmark.test.ts) for the full suite, and [BENCHMARK.md](docs/BENCHMARK.md) for results..
+The benchmark suite exercises all six MCP tools across TypeScript, Python, Go, and Rust, measuring token savings compared to the traditional Read+Edit approach. The primary metric is the reduction in context-window tokens achieved by using Scissorhands's pattern-based edits (a single tool call with a structural pattern) versus reading the entire file and issuing multiple edit calls. See [`tests/benchmarks/benchmark.test.ts`](tests/benchmarks/benchmark.test.ts) for the full suite, and [BENCHMARK.md](docs/BENCHMARK.md) for results..
 
 ## Development
 

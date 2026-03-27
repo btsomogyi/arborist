@@ -11,7 +11,7 @@ import { registerProvidersCommand } from './commands/providers.js';
 const program = new Command();
 
 program
-  .name('arborist')
+  .name('scissorhands')
   .description('AST-based polyglot code editor for AI agents')
   .version(version)
   .option('--json', 'Output in JSON format')

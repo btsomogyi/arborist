@@ -6,13 +6,13 @@ Accepted
 
 ## Context
 
-AI agents interacting with Arborist need to express code edits at varying levels of abstraction. Some agents reason at the level of structural patterns ("replace every `console.log($MSG)` with `logger.info($MSG)`"). Others reason at the level of named refactorings ("rename `foo` to `bar`"). Others need a raw escape hatch ("replace bytes 142-168 with this string").
+AI agents interacting with Scissorhands need to express code edits at varying levels of abstraction. Some agents reason at the level of structural patterns ("replace every `console.log($MSG)` with `logger.info($MSG)`"). Others reason at the level of named refactorings ("rename `foo` to `bar`"). Others need a raw escape hatch ("replace bytes 142-168 with this string").
 
 A single abstraction level forces either too much ceremony for simple edits or too little structure for complex refactorings. The edit API must accommodate all three use cases without conflating them.
 
 ## Decision
 
-Arborist exposes a **three-tier edit model**, ordered from most structural to most raw:
+Scissorhands exposes a **three-tier edit model**, ordered from most structural to most raw:
 
 ### Tier 1: Structural Pattern Edits
 

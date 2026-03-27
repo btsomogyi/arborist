@@ -1,10 +1,10 @@
-# Arborist: Domain-Driven Design Specification
+# Scissorhands: Domain-Driven Design Specification
 
 ## Overview
 
-This document defines the domain model for Arborist, an AST-based polyglot code editor for AI agents. It follows Domain-Driven Design (DDD) strategic and tactical patterns to decompose the system into bounded contexts, define aggregates and their invariants, establish a ubiquitous language, and specify domain events for cross-context communication.
+This document defines the domain model for Scissorhands, an AST-based polyglot code editor for AI agents. It follows Domain-Driven Design (DDD) strategic and tactical patterns to decompose the system into bounded contexts, define aggregates and their invariants, establish a ubiquitous language, and specify domain events for cross-context communication.
 
-Arborist's core mission is to give AI agents the ability to perform targeted, structure-aware edits to source code across multiple programming languages. The domain naturally decomposes into six bounded contexts: Parsing, Query, Edit, Operations, Language Provider, and Integration.
+Scissorhands's core mission is to give AI agents the ability to perform targeted, structure-aware edits to source code across multiple programming languages. The domain naturally decomposes into six bounded contexts: Parsing, Query, Edit, Operations, Language Provider, and Integration.
 
 ---
 
@@ -483,7 +483,7 @@ interface GrammarLoader {
 | Entity | Description | External Protocol |
 |---|---|---|
 | `CLIAdapter` | Parses CLI arguments (via commander or similar), constructs `OperationRequest` or direct parse/query requests, formats results as terminal output or unified diffs. | POSIX CLI conventions, stdin/stdout |
-| `MCPServerAdapter` | Implements the MCP server protocol. Maps `arborist_parse`, `arborist_query`, `arborist_edit`, and `arborist_batch` tool calls to domain requests. Returns JSON results. | MCP JSON-RPC over stdio |
+| `MCPServerAdapter` | Implements the MCP server protocol. Maps `scissorhands_parse`, `scissorhands_query`, `scissorhands_edit`, and `scissorhands_batch` tool calls to domain requests. Returns JSON results. | MCP JSON-RPC over stdio |
 | `SkillAdapter` | Wraps the library as a Claude Code skill. Maps skill invocations to domain requests. | Claude Code skill protocol |
 
 #### Domain Service: CommandRouter
@@ -513,7 +513,7 @@ The Integration domain's primary architectural role is as an **Anti-Corruption L
 ```
 External World                Integration ACL              Domain Model
 ──────────────               ───────────────              ────────────
-CLI args: "arborist edit     CLIAdapter parses args,      OperationRequest {
+CLI args: "scissorhands edit     CLIAdapter parses args,      OperationRequest {
   --file src/auth.ts         constructs domain objects      file: "src/auth.ts",
   --rename                   with validated types            operation: RenameOperation {
   --from isValid                                               from: "isValid",
@@ -523,7 +523,7 @@ CLI args: "arborist edit     CLIAdapter parses args,      OperationRequest {
 
 MCP JSON-RPC:                MCPServerAdapter              OperationRequest {
 {                            deserializes JSON,              file: "src/auth.ts",
-  "tool": "arborist_edit",   validates with Zod schema,      operation: RenameOperation {
+  "tool": "scissorhands_edit",   validates with Zod schema,      operation: RenameOperation {
   "input": {                 constructs domain objects          from: "isValid",
     "file": "src/auth.ts",                                     to: "isAuthenticated"
     "operation": {                                           }
@@ -555,7 +555,7 @@ The Integration domain has no aggregate roots (it is a purely translational laye
 
 ## 3. Ubiquitous Language
 
-The following terms have precise meanings within the Arborist domain. All code, documentation, APIs, error messages, and discussions should use these terms consistently.
+The following terms have precise meanings within the Scissorhands domain. All code, documentation, APIs, error messages, and discussions should use these terms consistently.
 
 ### Core Terms
 
@@ -890,7 +890,7 @@ sequenceDiagram
     participant PE as ParserEngine<br/>(Parsing)
     participant TD as TreeDocument<br/>(Parsing)
 
-    Agent->>MCP: arborist_edit { file, operation: { kind: "rename", from: "x", to: "y" } }
+    Agent->>MCP: scissorhands_edit { file, operation: { kind: "rename", from: "x", to: "y" } }
     MCP->>MCP: Validate input (Zod schema)
     MCP->>MCP: Sanitize file path
     MCP->>Router: EditRequest
@@ -932,12 +932,12 @@ sequenceDiagram
 
 ## 7. Error Handling Strategy
 
-Errors in Arborist are categorized by bounded context and severity. Each context defines its own error types, and the Integration domain's ACL translates them into agent-friendly messages.
+Errors in Scissorhands are categorized by bounded context and severity. Each context defines its own error types, and the Integration domain's ACL translates them into agent-friendly messages.
 
 ### Error Hierarchy
 
 ```
-ArboristError (base)
+ScissorhandsError (base)
   ParseError
     GrammarNotFoundError          -- No provider for the detected/specified language
     FatalParseError               -- Source text cannot be parsed at all
@@ -986,7 +986,7 @@ This section maps the DDD model to the project's implementation phases from PLAN
 
 ### Why six bounded contexts instead of a monolithic model?
 
-The operations in Arborist naturally separate by concern: parsing is about source-to-tree conversion, querying is about pattern matching, editing is about source-text mutation, and operations are about agent-intent translation. Merging these would create a "god object" that couples grammar knowledge with edit mechanics with CLI argument parsing. The bounded context boundaries prevent this coupling and allow each concern to evolve independently.
+The operations in Scissorhands naturally separate by concern: parsing is about source-to-tree conversion, querying is about pattern matching, editing is about source-text mutation, and operations are about agent-intent translation. Merging these would create a "god object" that couples grammar knowledge with edit mechanics with CLI argument parsing. The bounded context boundaries prevent this coupling and allow each concern to evolve independently.
 
 ### Why is the Operations domain separate from Edit?
 

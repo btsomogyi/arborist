@@ -6,60 +6,60 @@ Accepted
 
 ## Context
 
-Arborist must be usable across several integration surfaces:
+Scissorhands must be usable across several integration surfaces:
 
-1. **Programmatic use** — Other Node.js libraries and tools need to import Arborist as a dependency and call its API directly.
-2. **Shell and scripting** — Developers and CI pipelines need to invoke Arborist from the command line.
-3. **Claude Code tool integration** — Claude Code agents interact with external tools via the Model Context Protocol (MCP). To appear as a tool in Claude Code, Arborist must expose an MCP server.
-4. **Claude Code skill discoverability** — Claude Code skills provide a higher-level UX layer: slash commands, prompts, and contextual suggestions. A skill wrapper makes Arborist discoverable and ergonomic within Claude Code sessions.
+1. **Programmatic use** — Other Node.js libraries and tools need to import Scissorhands as a dependency and call its API directly.
+2. **Shell and scripting** — Developers and CI pipelines need to invoke Scissorhands from the command line.
+3. **Claude Code tool integration** — Claude Code agents interact with external tools via the Model Context Protocol (MCP). To appear as a tool in Claude Code, Scissorhands must expose an MCP server.
+4. **Claude Code skill discoverability** — Claude Code skills provide a higher-level UX layer: slash commands, prompts, and contextual suggestions. A skill wrapper makes Scissorhands discoverable and ergonomic within Claude Code sessions.
 
 Each surface has different invocation mechanics, I/O formats, and lifecycle expectations. However, the core editing logic is identical across all surfaces.
 
 ## Decision
 
-Ship Arborist as four artifacts, all built from the same core engine:
+Ship Scissorhands as four artifacts, all built from the same core engine:
 
-### 1. npm Library (`arborist-core` or `@arborist/core`)
+### 1. npm Library (`scissorhands-core` or `@scissorhands/core`)
 
 The core TypeScript library. Exports the `Engine` class, `LanguageProvider` interface, operation types, and utility functions. No CLI, no server — just the API.
 
 ```typescript
-import { Engine } from '@arborist/core';
+import { Engine } from '@scissorhands/core';
 const engine = new Engine();
 const result = await engine.edit(source, 'typescript', operations);
 ```
 
-### 2. CLI Tool (`arborist`)
+### 2. CLI Tool (`scissorhands`)
 
-A command-line interface wrapping the core library. Invocable as `arborist` (if globally installed) or `npx arborist`. Accepts source files, operation descriptions (JSON or flags), and outputs modified source or diffs.
+A command-line interface wrapping the core library. Invocable as `scissorhands` (if globally installed) or `npx scissorhands`. Accepts source files, operation descriptions (JSON or flags), and outputs modified source or diffs.
 
 ```bash
-arborist edit src/main.ts --pattern 'console.log($MSG)' --replace 'logger.info($MSG)'
-arborist rename src/main.ts --symbol foo --to bar
-arborist query src/main.ts --pattern 'function $NAME($$$PARAMS) { $$$BODY }'
+scissorhands edit src/main.ts --pattern 'console.log($MSG)' --replace 'logger.info($MSG)'
+scissorhands rename src/main.ts --symbol foo --to bar
+scissorhands query src/main.ts --pattern 'function $NAME($$$PARAMS) { $$$BODY }'
 ```
 
 Supports `--dry-run`, `--diff`, `--in-place`, and `--json` output modes.
 
 ### 3. MCP Server (stdio transport)
 
-An MCP server that exposes Arborist operations as MCP tools. Uses stdio transport (stdin/stdout JSON-RPC) for compatibility with Claude Code's MCP client.
+An MCP server that exposes Scissorhands operations as MCP tools. Uses stdio transport (stdin/stdout JSON-RPC) for compatibility with Claude Code's MCP client.
 
 Tools exposed:
 
-- `arborist_edit` — Apply structural pattern edits (Tier 1).
-- `arborist_refactor` — Apply named operations (Tier 2).
-- `arborist_query` — Query the AST and return matches.
-- `arborist_parse` — Parse source and return the AST structure.
-- `arborist_capabilities` — List supported languages and operations.
+- `scissorhands_edit` — Apply structural pattern edits (Tier 1).
+- `scissorhands_refactor` — Apply named operations (Tier 2).
+- `scissorhands_query` — Query the AST and return matches.
+- `scissorhands_parse` — Parse source and return the AST structure.
+- `scissorhands_capabilities` — List supported languages and operations.
 
 Each tool's input schema is defined with Zod, matching the operation types from the core library. This ensures consistent validation across all integration surfaces.
 
 ### 4. Claude Code Skill Wrapper
 
-A skill definition (`.claude/skills/arborist.md` or equivalent) that provides:
+A skill definition (`.claude/skills/scissorhands.md` or equivalent) that provides:
 
-- A `/arborist` slash command for interactive use.
+- A `/scissorhands` slash command for interactive use.
 - System prompt context describing available operations.
 - Example invocations for common tasks.
 
@@ -79,9 +79,9 @@ All four artifacts share:
 ### Positive
 
 - **Single source of truth.** All integration surfaces call the same core engine. A bug fix or feature addition in the core library is immediately available everywhere.
-- **Natural distribution.** npm is the standard distribution channel for Node.js tools. `npx arborist` works without global installation.
-- **MCP compatibility.** Claude Code agents can discover and invoke Arborist as a tool without any special integration. The MCP server is a standard stdio process.
-- **Skill discoverability.** The Claude Code skill makes Arborist a first-class citizen in Claude Code sessions, with documentation and examples available inline.
+- **Natural distribution.** npm is the standard distribution channel for Node.js tools. `npx scissorhands` works without global installation.
+- **MCP compatibility.** Claude Code agents can discover and invoke Scissorhands as a tool without any special integration. The MCP server is a standard stdio process.
+- **Skill discoverability.** The Claude Code skill makes Scissorhands a first-class citizen in Claude Code sessions, with documentation and examples available inline.
 
 ### Negative
 

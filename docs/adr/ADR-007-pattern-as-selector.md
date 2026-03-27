@@ -18,7 +18,7 @@ Requirements for the targeting mechanism:
 
 ## Decision
 
-Use **ast-grep code-native patterns** as the universal targeting mechanism in Arborist. A pattern is a snippet of code in the target language with special metavariable syntax for wildcards:
+Use **ast-grep code-native patterns** as the universal targeting mechanism in Scissorhands. A pattern is a snippet of code in the target language with special metavariable syntax for wildcards:
 
 - **`$NAME`** matches any single AST node and captures it as `NAME`.
 - **`$$$ARGS`** matches zero or more AST nodes (variadic capture).

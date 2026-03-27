@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { Command } from 'commander';
 import { applyEdit } from '../../engine/editor.js';
 import { formatBatchJson } from '../formatters/json.js';
-import type { ArboristEdit, BatchEditResult, EditResult } from '../../core/types.js';
+import type { ScissorhandsEdit, BatchEditResult, EditResult } from '../../core/types.js';
 import '../../languages/index.js';
 
 export function registerApplyCommand(program: Command): void {
@@ -13,7 +13,7 @@ export function registerApplyCommand(program: Command): void {
     .action(async (editsFile: string, opts: { dryRun?: boolean }, cmd: Command) => {
       try {
         const raw = await readFile(editsFile, 'utf-8');
-        let parsed: { edits: ArboristEdit[] };
+        let parsed: { edits: ScissorhandsEdit[] };
         try {
           parsed = JSON.parse(raw);
         } catch {

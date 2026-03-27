@@ -17,7 +17,7 @@ export type {
   Remove,
   RawEdit,
   EditOperation,
-  ArboristEdit,
+  ScissorhandsEdit,
   ChangeDescriptor,
   EditResult,
   ASTNode,
@@ -30,7 +30,7 @@ export type {
 
 // Errors
 export {
-  ArboristError,
+  ScissorhandsError,
   ParseError,
   QueryError,
   EditError,

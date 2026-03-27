@@ -21,7 +21,7 @@ const symbolPatternMap: Record<string, string> = {
 
 export function registerListSymbolsTool(server: McpServer): void {
   server.tool(
-    'arborist_list_symbols',
+    'scissorhands_list_symbols',
     'List symbols (functions, classes, variables, imports, exports) in a source file',
     listSymbolsInputSchema.shape,
     async (input) => {

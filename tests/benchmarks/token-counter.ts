@@ -1,5 +1,5 @@
 /**
- * Token estimation utility for comparing arborist vs traditional approaches.
+ * Token estimation utility for comparing scissorhands vs traditional approaches.
  *
  * Uses the standard ~4 chars/token approximation for Claude/GPT models.
  * This is intentionally conservative — real tokenizers produce ~3.5-4.2 chars/token
@@ -64,13 +64,13 @@ export function measureTraditionalApproach(scenario: {
 }
 
 /**
- * Measures token cost of the arborist approach:
- *   1. A single arborist tool call (pattern-based, no file reading needed)
+ * Measures token cost of the scissorhands approach:
+ *   1. A single scissorhands tool call (pattern-based, no file reading needed)
  *   2. Tool returns a concise result
  *
  * The key saving: the agent never needs to read the full file into context.
  */
-export function measureArboristApproach(scenario: {
+export function measureScissorhandsApproach(scenario: {
   instruction: string;
   toolCall: Record<string, unknown>;
   /** Estimated result size from the tool */
@@ -111,7 +111,7 @@ export interface BenchmarkResult {
   tool: string;
   description: string;
   traditional: TokenMeasurement;
-  arborist: TokenMeasurement;
+  scissorhands: TokenMeasurement;
   savings: {
     absoluteTokens: number;
     percentReduction: number;
@@ -127,9 +127,9 @@ export function computeSavings(
   description: string,
   fileContent: string,
   traditional: TokenMeasurement,
-  arborist: TokenMeasurement,
+  scissorhands: TokenMeasurement,
 ): BenchmarkResult {
-  const saved = traditional.totalTokens - arborist.totalTokens;
+  const saved = traditional.totalTokens - scissorhands.totalTokens;
   const percent = (saved / traditional.totalTokens) * 100;
 
   return {
@@ -138,7 +138,7 @@ export function computeSavings(
     tool,
     description,
     traditional,
-    arborist,
+    scissorhands,
     savings: {
       absoluteTokens: saved,
       percentReduction: Math.round(percent * 10) / 10,
@@ -153,7 +153,7 @@ export function formatReport(results: BenchmarkResult[]): string {
 
   lines.push('');
   lines.push('='.repeat(90));
-  lines.push('  ARBORIST BENCHMARK REPORT — Token Savings Analysis');
+  lines.push('  SCISSORHANDS BENCHMARK REPORT — Token Savings Analysis');
   lines.push('='.repeat(90));
   lines.push('');
 
@@ -174,7 +174,7 @@ export function formatReport(results: BenchmarkResult[]): string {
       padRight('  Scenario', 36) +
         padRight('Tool', 20) +
         padRight('Traditional', 14) +
-        padRight('Arborist', 12) +
+        padRight('Scissorhands', 12) +
         padRight('Saved', 10) +
         'Reduction',
     );
@@ -185,7 +185,7 @@ export function formatReport(results: BenchmarkResult[]): string {
         padRight(`  ${r.name}`, 36) +
           padRight(r.tool, 20) +
           padRight(`${r.traditional.totalTokens}`, 14) +
-          padRight(`${r.arborist.totalTokens}`, 12) +
+          padRight(`${r.scissorhands.totalTokens}`, 12) +
           padRight(`${r.savings.absoluteTokens}`, 10) +
           `${r.savings.percentReduction}%`,
       );
@@ -204,15 +204,15 @@ export function formatReport(results: BenchmarkResult[]): string {
   lines.push('='.repeat(90));
 
   const totalTraditional = results.reduce((s, r) => s + r.traditional.totalTokens, 0);
-  const totalArborist = results.reduce((s, r) => s + r.arborist.totalTokens, 0);
-  const totalSaved = totalTraditional - totalArborist;
+  const totalScissorhands = results.reduce((s, r) => s + r.scissorhands.totalTokens, 0);
+  const totalSaved = totalTraditional - totalScissorhands;
   const overallPercent = Math.round((totalSaved / totalTraditional) * 1000) / 10;
 
   lines.push('');
   lines.push(`  Total benchmarks:      ${results.length}`);
   lines.push(`  Languages tested:      ${byLang.size}`);
   lines.push(`  Traditional tokens:    ${totalTraditional.toLocaleString()}`);
-  lines.push(`  Arborist tokens:       ${totalArborist.toLocaleString()}`);
+  lines.push(`  Scissorhands tokens:       ${totalScissorhands.toLocaleString()}`);
   lines.push(`  Tokens saved:          ${totalSaved.toLocaleString()}`);
   lines.push(`  Overall reduction:     ${overallPercent}%`);
   lines.push('');

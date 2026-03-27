@@ -1,8 +1,8 @@
-# Arborist: AST-Based Polyglot Code Editor for AI Agents
+# Scissorhands: AST-Based Polyglot Code Editor for AI Agents
 
 ## Executive Summary
 
-Arborist is a TypeScript/Node.js package that gives AI agents (Claude Code
+Scissorhands is a TypeScript/Node.js package that gives AI agents (Claude Code
 skills, MCP tools) the ability to perform **targeted, structure-aware edits**
 to source code files across multiple programming languages. It wraps
 **ast-grep's NAPI bindings** (`@ast-grep/napi`) as its primary engine,
@@ -58,11 +58,11 @@ both CLI and MCP server interfaces.
 - **web-tree-sitter**: WASM-based, significantly slower than native bindings
   in Node.js. Only appropriate for browser contexts.
 
-### 1.3 What Arborist Builds on Top of ast-grep
+### 1.3 What Scissorhands Builds on Top of ast-grep
 
-ast-grep provides the engine. Arborist provides the **agent-facing interface**:
+ast-grep provides the engine. Scissorhands provides the **agent-facing interface**:
 
-| Layer | ast-grep provides | Arborist adds |
+| Layer | ast-grep provides | Scissorhands adds |
 |-------|-------------------|---------------|
 | Parsing | `parse(lang, source)` | File I/O, language detection, caching |
 | Querying | `SgNode.find/findAll` with patterns | Named query library, result serialization |
@@ -90,7 +90,7 @@ ast-grep provides the engine. Arborist provides the **agent-facing interface**:
 ### 2.2 Package Structure
 
 ```
-arborist/
+scissorhands/
   src/
     core/                    # Core abstractions
       types.ts               # Shared type definitions
@@ -189,7 +189,7 @@ interface NodeTypeMap {
 
 // === Edit Model ===
 
-interface ArboristEdit {
+interface ScissorhandsEdit {
   /** Target file path */
   file: string;
 
@@ -276,7 +276,7 @@ interface Move {
 
 // === Query Model ===
 
-interface ArboristQuery {
+interface ScissorhandsQuery {
   /** Target file path */
   file: string;
 
@@ -339,7 +339,7 @@ rename("x","y")  =>  [{start,end,"y"},    =>  commitEdits(edits)
 - ast-grep's `commitEdits()` operates on byte ranges against the original
   source string. Any bytes outside of edit ranges are preserved exactly.
 - Comments and whitespace are only modified if they fall within an edit range.
-- Indentation within inserted text is the caller's responsibility; arborist
+- Indentation within inserted text is the caller's responsibility; scissorhands
   will provide indentation detection helpers.
 
 ---
@@ -437,24 +437,24 @@ rule system for advanced use cases where pattern syntax is insufficient.
 
 ```bash
 # Parse and display AST structure
-arborist parse src/auth.ts
+scissorhands parse src/auth.ts
 
 # Query for pattern matches
-arborist query src/auth.ts --pattern "console.log(\$MSG)"
+scissorhands query src/auth.ts --pattern "console.log(\$MSG)"
 
 # Apply a structural replace
-arborist edit src/auth.ts --replace \
+scissorhands edit src/auth.ts --replace \
   --pattern "console.log(\$MSG)" \
   --with "logger.info(\$MSG)"
 
 # Apply a high-level operation
-arborist edit src/auth.ts --rename --from isValid --to isAuthenticated
+scissorhands edit src/auth.ts --rename --from isValid --to isAuthenticated
 
 # Apply edits from a JSON file
-arborist apply edits.json
+scissorhands apply edits.json
 
 # Dry-run: show what would change without writing
-arborist edit src/auth.ts --replace \
+scissorhands edit src/auth.ts --replace \
   --pattern "console.log(\$MSG)" \
   --with "logger.info(\$MSG)" \
   --dry-run
@@ -465,10 +465,10 @@ arborist edit src/auth.ts --replace \
 The MCP server exposes tools that Claude Code can invoke directly:
 
 ```typescript
-// Tool: arborist_parse
+// Tool: scissorhands_parse
 // Parses a file and returns its AST structure
 {
-  name: "arborist_parse",
+  name: "scissorhands_parse",
   description: "Parse a source file and return its AST structure",
   inputSchema: {
     type: "object",
@@ -485,10 +485,10 @@ The MCP server exposes tools that Claude Code can invoke directly:
   }
 }
 
-// Tool: arborist_query
+// Tool: scissorhands_query
 // Searches for structural patterns in source files
 {
-  name: "arborist_query",
+  name: "scissorhands_query",
   description: "Search for code patterns using structural matching",
   inputSchema: {
     type: "object",
@@ -501,10 +501,10 @@ The MCP server exposes tools that Claude Code can invoke directly:
   }
 }
 
-// Tool: arborist_edit
+// Tool: scissorhands_edit
 // Applies structural edits to source files
 {
-  name: "arborist_edit",
+  name: "scissorhands_edit",
   description: "Apply targeted, AST-aware edits to a source file",
   inputSchema: {
     type: "object",
@@ -520,10 +520,10 @@ The MCP server exposes tools that Claude Code can invoke directly:
   }
 }
 
-// Tool: arborist_batch
+// Tool: scissorhands_batch
 // Applies multiple edits atomically
 {
-  name: "arborist_batch",
+  name: "scissorhands_batch",
   description: "Apply multiple edits to one or more files atomically",
   inputSchema: {
     type: "object",
@@ -542,30 +542,30 @@ The MCP server exposes tools that Claude Code can invoke directly:
 
 ### 4.3 Claude Code Skill Wrapper
 
-A Claude Code skill can wrap arborist's MCP tools or import the library
+A Claude Code skill can wrap scissorhands's MCP tools or import the library
 directly:
 
 ```typescript
 // As a skill using the library directly
-import { Arborist } from "arborist";
+import { Scissorhands } from "scissorhands";
 
-const arborist = new Arborist();
+const scissorhands = new Scissorhands();
 
 // Parse
-const tree = await arborist.parse("src/auth.ts");
+const tree = await scissorhands.parse("src/auth.ts");
 
 // Query
-const matches = await arborist.query("src/auth.ts", "console.log($MSG)");
+const matches = await scissorhands.query("src/auth.ts", "console.log($MSG)");
 
 // Edit
-const result = await arborist.edit("src/auth.ts", {
+const result = await scissorhands.edit("src/auth.ts", {
   kind: "replace",
   pattern: "console.log($MSG)",
   replacement: "logger.info($MSG)"
 });
 
 // Batch edit
-const results = await arborist.batch([
+const results = await scissorhands.batch([
   {
     file: "src/auth.ts",
     operation: { kind: "rename", from: "isValid", to: "isAuthenticated" }
@@ -581,10 +581,10 @@ const results = await arborist.batch([
 
 **Phase 1 (MVP)**: Library + CLI
 - Publish as npm package
-- CLI via `npx arborist` or installed binary
+- CLI via `npx scissorhands` or installed binary
 
 **Phase 2**: MCP Server
-- Add MCP server mode: `arborist mcp`
+- Add MCP server mode: `scissorhands mcp`
 - Register as a Claude Code MCP tool
 
 **Phase 3**: Claude Code Skill
@@ -626,8 +626,8 @@ MVP includes P0 and P1 operations.
 ### 5.3 Integration: Library + CLI
 
 MVP ships as:
-1. An npm package (`arborist`) importable as a library
-2. A CLI tool (`arborist` / `npx arborist`)
+1. An npm package (`scissorhands`) importable as a library
+2. A CLI tool (`scissorhands` / `npx scissorhands`)
 3. Dry-run mode for all operations
 
 MCP server is Phase 2.
@@ -660,7 +660,7 @@ MCP server is Phase 2.
 | Unit tests for parse and query | 1.5d | Low |
 | CLI: parse and query commands | 1d | Low |
 
-**Deliverable**: `arborist parse` and `arborist query` working for TS + Python.
+**Deliverable**: `scissorhands parse` and `scissorhands query` working for TS + Python.
 
 **Key Risk**: ast-grep pattern syntax varies subtly between languages.
 Mitigation: Build a comprehensive test fixture set per language early.
@@ -681,7 +681,7 @@ Mitigation: Build a comprehensive test fixture set per language early.
 | Unit tests for all edit operations | 2d | Medium |
 | CLI: edit command + dry-run mode | 1d | Low |
 
-**Deliverable**: `arborist edit` working for replace, rename, insert, remove.
+**Deliverable**: `scissorhands edit` working for replace, rename, insert, remove.
 
 **Key Risk**: Multi-edit conflict resolution and indentation preservation in
 Python. Mitigation: Fail-fast on overlapping edits; indentation helper infers
@@ -753,7 +753,7 @@ committing to the full operation set.
 
 ### 8.1 Pattern-as-Selector Model
 
-Instead of inventing a new selector syntax, arborist uses ast-grep patterns
+Instead of inventing a new selector syntax, scissorhands uses ast-grep patterns
 as the universal targeting mechanism. A pattern like
 `function $NAME($$$PARAMS) { $$$BODY }` simultaneously:
 - **Identifies** which nodes to operate on
@@ -766,7 +766,7 @@ or any new DSL. They write patterns in the language they're editing.
 ### 8.2 Scoped Edits via Nested Patterns
 
 To scope an edit (e.g., "rename `x` to `y` only inside function `foo`"),
-arborist supports a `scope` parameter that nests the edit within a
+scissorhands supports a `scope` parameter that nests the edit within a
 containing pattern:
 
 ```json
@@ -870,11 +870,11 @@ providing all-or-nothing semantics.
 
 ## 11. Open Questions
 
-1. **Should arborist support glob patterns for multi-file operations?**
+1. **Should scissorhands support glob patterns for multi-file operations?**
    Leaning yes for CLI, no for MCP (let the agent iterate over files).
 
 2. **Should we support `.editorconfig` / prettier for formatting inserted code?**
-   Leaning no for MVP. Arborist preserves existing formatting; it doesn't
+   Leaning no for MVP. Scissorhands preserves existing formatting; it doesn't
    reformat. Inserted code should be pre-formatted by the agent.
 
 3. **Should we expose ast-grep's rule system (YAML-based)?**

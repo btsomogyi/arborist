@@ -18,7 +18,7 @@ beforeAll(() => {
 // These tests exercise the same logic the MCP tool handlers use,
 // without needing an actual MCP transport.
 describe('MCP tool handlers (functional)', () => {
-  describe('arborist_parse', () => {
+  describe('scissorhands_parse', () => {
     it('parses a file and returns AST', async () => {
       const result = await parseFile(FIXTURE, { maxDepth: 5 });
       expect(result.file).toBe(FIXTURE);
@@ -32,7 +32,7 @@ describe('MCP tool handlers (functional)', () => {
     });
   });
 
-  describe('arborist_query', () => {
+  describe('scissorhands_query', () => {
     it('finds matches for a pattern', async () => {
       const result = await queryFile(FIXTURE, 'console.log($$$ARGS)');
       expect(result.matchCount).toBeGreaterThan(0);
@@ -45,12 +45,12 @@ describe('MCP tool handlers (functional)', () => {
     });
   });
 
-  describe('arborist_edit', () => {
+  describe('scissorhands_edit', () => {
     let tmpDir: string;
     let tmpFile: string;
 
     beforeEach(async () => {
-      tmpDir = await mkdtemp(resolve(tmpdir(), 'arborist-mcp-'));
+      tmpDir = await mkdtemp(resolve(tmpdir(), 'scissorhands-mcp-'));
       tmpFile = resolve(tmpDir, 'test.ts');
       await writeFile(tmpFile, await readFile(FIXTURE, 'utf-8'));
     });
@@ -98,7 +98,7 @@ describe('MCP tool handlers (functional)', () => {
     });
   });
 
-  describe('arborist_list_symbols', () => {
+  describe('scissorhands_list_symbols', () => {
     it('finds symbols via language patterns', async () => {
       const provider = registry.inferFromFilePath(FIXTURE);
       expect(provider).toBeDefined();
@@ -109,12 +109,12 @@ describe('MCP tool handlers (functional)', () => {
     });
   });
 
-  describe('arborist_rename', () => {
+  describe('scissorhands_rename', () => {
     let tmpDir: string;
     let tmpFile: string;
 
     beforeEach(async () => {
-      tmpDir = await mkdtemp(resolve(tmpdir(), 'arborist-mcp-'));
+      tmpDir = await mkdtemp(resolve(tmpdir(), 'scissorhands-mcp-'));
       tmpFile = resolve(tmpDir, 'test.ts');
       await writeFile(tmpFile, 'const count = 0;\nconsole.log(count);\n');
     });

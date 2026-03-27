@@ -120,7 +120,7 @@ export type EditOperation =
   | Remove
   | RawEdit;
 
-export interface ArboristEdit {
+export interface ScissorhandsEdit {
   file: string;
   operation: EditOperation;
 }

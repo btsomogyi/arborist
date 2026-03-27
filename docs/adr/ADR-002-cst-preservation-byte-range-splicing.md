@@ -17,7 +17,7 @@ Both tree-sitter and ast-grep produce **Concrete Syntax Trees (CSTs)**, not abst
 
 ## Decision
 
-All edit operations in Arborist operate as **byte-range replacements on the original source string**. The editing pipeline is:
+All edit operations in Scissorhands operate as **byte-range replacements on the original source string**. The editing pipeline is:
 
 1. **Parse** the source to obtain a CST with byte-accurate node positions.
 2. **Query** the CST to identify target nodes (via patterns, named operations, or raw positions).
@@ -41,7 +41,7 @@ ast-grep's `commitEdits()` implements this model natively. For the tree-sitter b
 
 - **Byte-perfect preservation.** Comments, blank lines, trailing whitespace, mixed indentation, and all other non-structural content are preserved exactly. The only bytes that change are the ones inside edit ranges.
 - **Minimal diffs.** Code review shows only the semantic changes, not reformatting noise.
-- **Style agnostic.** Arborist does not need to know or enforce any formatting style. It works with any code style because it never reformats.
+- **Style agnostic.** Scissorhands does not need to know or enforce any formatting style. It works with any code style because it never reformats.
 - **Predictable for agents.** AI agents can reason about edits in terms of "replace this range with this text" without worrying about side effects on unrelated parts of the file.
 
 ### Negative

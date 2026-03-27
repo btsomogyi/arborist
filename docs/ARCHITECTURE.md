@@ -1,8 +1,8 @@
-# Arborist: System Architecture
+# Scissorhands: System Architecture
 
 ## 1. System Overview
 
-Arborist is an AST-based polyglot code editor designed for AI agent
+Scissorhands is an AST-based polyglot code editor designed for AI agent
 consumption. It wraps ast-grep's NAPI bindings to provide structure-aware
 code editing via CLI and MCP server interfaces. The system enables agents
 to perform targeted refactoring operations (rename, replace, insert, remove)
@@ -77,7 +77,7 @@ all formatting outside of edit ranges.
 |                                                                     |
 |  +---------------------------+                                      |
 |  | LanguageProviderRegistry  |  Singleton. Manages lifecycle.       |
-|  | register() / get()        |  Discovers @arborist/lang-* pkgs.   |
+|  | register() / get()        |  Discovers @scissorhands/lang-* pkgs.   |
 |  | inferFromPath() / list()  |                                     |
 |  +----------+----------------+                                      |
 |             |                                                       |
@@ -181,12 +181,12 @@ across the system. This is the vocabulary of the domain.
 - `LanguagePatterns` interface
 - `NodeTypeMap` interface
 - `EditOperation` discriminated union (Replace | Rename | Insert | Remove | Wrap | Extract | Move)
-- `ArboristEdit`, `ArboristQuery`, `QueryResult`, `MatchInfo`
+- `ScissorhandsEdit`, `ScissorhandsQuery`, `QueryResult`, `MatchInfo`
 - `EditResult`, `ChangeDescriptor`
 - `OperationRequest`, `ParseResult`
 - `Position` (`{ line, column }`), `Range` (`{ start, end }`), `ByteRange` (`{ startPos, endPos }`)
 
-**Dependencies**: None. This module has zero imports from other arborist modules.
+**Dependencies**: None. This module has zero imports from other scissorhands modules.
 
 **Design constraint**: This module must remain dependency-free. All other
 modules import from types; types imports from nothing. This prevents
@@ -204,7 +204,7 @@ how to fix it.
 **Hierarchy**:
 
 ```
-ArboristError (base)
+ScissorhandsError (base)
   |
   +-- ParseError
   |     Code: PARSE_FAILED, FILE_NOT_FOUND, UNSUPPORTED_LANGUAGE
@@ -257,9 +257,9 @@ inference from file extension, and discovery of external provider packages.
 instance (for normal use) and the class (for testing with fresh instances).
 
 **Provider discovery**: On initialization, scans `node_modules` for packages
-matching the `@arborist/lang-*` naming convention. Each package must export
+matching the `@scissorhands/lang-*` naming convention. Each package must export
 a `LanguageProvider` at its main entry point. This enables third-party
-language support without modifying arborist core.
+language support without modifying scissorhands core.
 
 ---
 
@@ -496,14 +496,14 @@ codes.
 **Commands**:
 
 ```
-arborist parse <file> [--depth N] [--node-types type1,type2]
-arborist query <file> --pattern <pattern> [--language lang]
-arborist edit <file> --replace --pattern <p> --with <r> [--dry-run]
-arborist edit <file> --rename --from <old> --to <new> [--scope <pattern>]
-arborist edit <file> --insert --anchor <pattern> --position before|after --content <text>
-arborist edit <file> --remove --pattern <p>
-arborist apply <edits.json> [--dry-run]
-arborist providers list
+scissorhands parse <file> [--depth N] [--node-types type1,type2]
+scissorhands query <file> --pattern <pattern> [--language lang]
+scissorhands edit <file> --replace --pattern <p> --with <r> [--dry-run]
+scissorhands edit <file> --rename --from <old> --to <new> [--scope <pattern>]
+scissorhands edit <file> --insert --anchor <pattern> --position before|after --content <text>
+scissorhands edit <file> --remove --pattern <p>
+scissorhands apply <edits.json> [--dry-run]
+scissorhands providers list
 ```
 
 **Output formats**: `--format json` (default for piping) or `--format text`
@@ -514,7 +514,7 @@ on cli.
 
 #### MCP Server Adapter (`src/mcp/server.ts`)
 
-**Responsibility**: Exposes arborist functionality as MCP tools using
+**Responsibility**: Exposes scissorhands functionality as MCP tools using
 `@modelcontextprotocol/sdk`. Handles tool registration, Zod schema
 validation, and result formatting.
 
@@ -522,22 +522,22 @@ validation, and result formatting.
 
 | Tool Name | Maps To | Input Schema (Zod) |
 |-----------|---------|---------------------|
-| `arborist_parse` | ParserEngine.parse | `{ file: z.string(), depth?: z.number(), nodeTypes?: z.array(z.string()) }` |
-| `arborist_query` | QueryEngine.findAll | `{ file: z.string(), pattern: z.string(), language?: z.string() }` |
-| `arborist_edit` | OperationResolver + EditEngine | `{ file: z.string(), operation: EditOperationSchema, dryRun?: z.boolean() }` |
-| `arborist_batch` | Multiple OperationResolver + EditEngine | `{ edits: z.array(ArboristEditSchema), dryRun?: z.boolean() }` |
+| `scissorhands_parse` | ParserEngine.parse | `{ file: z.string(), depth?: z.number(), nodeTypes?: z.array(z.string()) }` |
+| `scissorhands_query` | QueryEngine.findAll | `{ file: z.string(), pattern: z.string(), language?: z.string() }` |
+| `scissorhands_edit` | OperationResolver + EditEngine | `{ file: z.string(), operation: EditOperationSchema, dryRun?: z.boolean() }` |
+| `scissorhands_batch` | Multiple OperationResolver + EditEngine | `{ edits: z.array(ScissorhandsEditSchema), dryRun?: z.boolean() }` |
 
 **Dependencies**: core, engine, operations, `@modelcontextprotocol/sdk`, `zod`.
 Nothing depends on mcp.
 
-#### Skill Wrapper (`.claude/skills/arborist.md`)
+#### Skill Wrapper (`.claude/skills/scissorhands.md`)
 
 **Responsibility**: A Claude Code skill definition that describes when and
-how the agent should use arborist. Not executable code; rather, a markdown
+how the agent should use scissorhands. Not executable code; rather, a markdown
 file that guides Claude's tool selection.
 
-**Contents**: Describes arborist's capabilities, provides example
-invocations for each operation type, and specifies when arborist should be
+**Contents**: Describes scissorhands's capabilities, provides example
+invocations for each operation type, and specifies when scissorhands should be
 preferred over raw text editing (structural changes, multi-occurrence
 renames, pattern-based replacements).
 
@@ -572,7 +572,7 @@ function and a new case in the discriminated union.
 `LanguageProviderRegistry` centralizes provider management:
 - Single point of registration and lookup
 - Language inference from file extension
-- External package discovery (`@arborist/lang-*`)
+- External package discovery (`@scissorhands/lang-*`)
 - Prevents duplicate registration
 - Enumerates available providers for help messages
 
@@ -649,7 +649,7 @@ This section traces a complete edit through every component in the system.
 The MCP adapter validates the input against its Zod schema:
 
 ```
-arborist_edit input:
+scissorhands_edit input:
   file:      z.string()         --> "src/auth.ts"        PASS
   operation: EditOperationSchema --> { kind: "rename" }   PASS
   dryRun:    z.boolean().opt()  --> undefined (default false)
@@ -852,7 +852,7 @@ resolveProvider(filePath: string): LanguageProvider
     if extension in provider.extensions:
       return provider
 
-  // Priority 3: Check for external @arborist/lang-* packages
+  // Priority 3: Check for external @scissorhands/lang-* packages
   externalProvider = scanForExternalProvider(extension)
   if externalProvider:
     register(externalProvider)
@@ -956,7 +956,7 @@ existing components.
 **What to do**: Implement a `LanguageProvider` and register it.
 
 ```
-1. Create src/languages/go.ts (or @arborist/lang-go package)
+1. Create src/languages/go.ts (or @scissorhands/lang-go package)
 2. Implement LanguageProvider interface:
    - id: "go"
    - extensions: [".go"]
